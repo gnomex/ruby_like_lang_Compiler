@@ -16,8 +16,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    src/lex.cpp
+    src/lex.cpp \
+    src/tablesymbol.cpp
 
 HEADERS += \
     src/lex.h \
-    src/Defs.h
+    src/Defs.h \
+    src/tablesymbol.h
