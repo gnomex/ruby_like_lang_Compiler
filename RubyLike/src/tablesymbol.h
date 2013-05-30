@@ -1,9 +1,13 @@
 #ifndef TABLESYMBOL_H
 #define TABLESYMBOL_H
 
+#include "Defs.h"
+
 class TableSymbol
 {
-public:
+    private:
+
+    public:
     TableSymbol();
 };
 
