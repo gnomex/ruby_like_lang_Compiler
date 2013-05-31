@@ -18,10 +18,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     src/lex.cpp \
     src/tablesymbol.cpp \
-    src/file.cpp
+    src/file.cpp \
+    src/tokentype.cpp \
+    src/ast.cpp
 
 HEADERS += \
     src/lex.h \
     src/Defs.h \
     src/tablesymbol.h \
-    src/file.h
+    src/file.h \
+    src/tokentype.h \
+    src/ast.h

@@ -6,6 +6,7 @@
 class Lex
 {
     private:
+
         char *input;
         int dot;
         int inputChar;

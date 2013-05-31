@@ -14,17 +14,4 @@ using namespace std;
 #define INTEGER     258
 #define ERRONEOUS   259
 
-typedef struct {
-    char* fileName;
-    int lineNumber;
-    int charNumber;
-} PositionInFile;
-
-typedef struct {
-    int classe;
-    char* repr;
-    PositionInFile pos;
-} TokenType;
-
-extern TokenType Token;
 #endif // DEFS_H
