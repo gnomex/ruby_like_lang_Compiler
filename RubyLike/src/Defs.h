@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <QHash>
+#include <QList>
 
 using namespace std;
 

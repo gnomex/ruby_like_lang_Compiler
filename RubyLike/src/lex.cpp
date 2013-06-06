@@ -1,5 +1,6 @@
 #include "lex.h"
 
+#define isEndOfLine(ch)                     ((ch) == '\n')
 #define isEndOfInput(ch)                    ((ch) == '\0')
 #define isLayout(ch)                        (!isEndOfInput(ch) && (ch) <= ' ')
 #define isCommentStarter(ch)                ((ch) == '#')
@@ -13,28 +14,22 @@
 #define isUnderscore(ch)                    ((ch) == '_')
 
 #define isOperator(ch)                      (strchr("+-*/", (ch)) != 0)
-#define isSeparator(ch)                     (strchr(";,(){}", (ch)) != 0)
+#define isSeparator(ch)                     (strchr(",(){}=;", (ch)) != 0)
 
 Lex::Lex()
 {
+
 }
 
 Lex::~Lex(){}
 
-/*void Lex::nextChar(){
+void Lex::nextChar(){
     inputChar = input[++dot];
+    cout<<"nextChar: "<<(char)inputChar<<endl;
 }
 
-
-char* Lex::getInput() {
-    char *ch = (char *) malloc(50);
-    cout << "Informe o texto de entrada: " << endl;
-    fgets(ch, 50, stdin);
-    return ch;
-}
-
-void Lex::recognizeIdentifier() {
-    Token.classe = IDENTIFIER;
+void Lex::recognizeIdentifier(TokenType *no) {
+    no->setClasse(IDENTIFIER);
     nextChar();
     while(isLetterOrDigit(inputChar)) {
         nextChar();
@@ -47,8 +42,8 @@ void Lex::recognizeIdentifier() {
     }
 }
 
-void Lex::recognizeInteger() {
-    Token.classe = INTEGER;
+void Lex::recognizeInteger(TokenType *no) {
+    no->setClasse(INTEGER);
     nextChar();
     while (isDigit(inputChar)) {
         nextChar();
@@ -75,13 +70,19 @@ void Lex::skipLayoutAndComment() {
 }
 
 void Lex::noteTokenPosition() {
-    Token.pos.charNumber = dot;
+    //Token.pos.charNumber = dot;
 }
 
-void Lex::startLex() {
-    input = getInput();
-    dot = 0;
-    inputChar = input[dot];
+bool Lex::startLex(File& file) {
+    input = file.readString(); //le uma linha do arquivo
+    if(input){
+        dot = 0;
+        inputChar = input[dot];
+        cout<<"Entrada: "<<input<<" dot: "<<dot<<" inputChar: "<<(char)inputChar<<endl;
+        list = ProducerList::getInstance(); //pega referencia da lista de produçoes
+        return true;
+    }
+    else return false;
 }
 
 char* Lex::inputToZString (int iStart, int iLength) {
@@ -93,33 +94,53 @@ char* Lex::inputToZString (int iStart, int iLength) {
     ch[i] = '\0';
     return ch;
 }
-
+/*
+ * Le o buffer e classifica a entrada, podendo ser:
+ * Fim do arquivo, identificador, inteiro, operador, ou um erro
+ */
 void Lex::getNextToken() {
+    TokenType *no = new TokenType(); //cria nova na lista
     int startDot;
 
     skipLayoutAndComment();
     noteTokenPosition();
     startDot = dot;
 
+    if(isEndOfLine(inputChar)){
+        return;
+    }
     if (isEndOfInput(inputChar)) {
-        Token.classe = FIM;
-        Token.repr = "<FIM>";
+        no->setClasse(FIM);
+        no->setToken("<FIM>");
         return;
     }
     if (isLetter(inputChar)) {
-        recognizeIdentifier();
-    }
-    else if (isDigit(inputChar)) {
-        recognizeInteger();
+        recognizeIdentifier(no);
+        getNextToken();
     }
     else if (isOperator(inputChar) || isSeparator(inputChar)) {
-        Token.classe = inputChar;
+        no->setClasse(inputChar);
         nextChar();
+        getNextToken();
+    }
+    else if (isDigit(inputChar)) {
+        recognizeInteger(no);
+        getNextToken();
     }
     else {
-        Token.classe = ERRONEOUS;
+        no->setClasse(ERRONEOUS);
         nextChar();
     }
-    Token.repr = inputToZString(startDot, dot-startDot);
+    //copia o token do buffer
+    no->setToken(inputToZString(startDot, dot-startDot));
+
+    list->insert(no); //nova entrada na lista
 }
-*/
+
+bool Lex::parser(File& file){
+    if(startLex(file)){
+        getNextToken();
+        return true;
+    }
+    return false;
+}

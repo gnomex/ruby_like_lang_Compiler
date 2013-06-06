@@ -8,12 +8,14 @@ class File
     private:
         ifstream in;
         ofstream out;
+        int type;
 
     public:
         File(const char *fileName,int type);
         File(){}
         ~File();
         void open(const char *fileName,int type);
+        bool isOpen();
         void close();
         char readChar();
         char* readString();

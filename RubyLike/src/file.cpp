@@ -4,9 +4,11 @@ File::File(const char *fileName, int type)
 {
     if(type){
         in.open(fileName, ios_base::in);
+        this->type = type;
     }
     else{
         out.open(fileName, ios_base::out | ios_base::app);
+        this->type = type;
     }
 }
 
@@ -18,9 +20,22 @@ File::~File(){
 void File::open(const char *fileName, int type){
     if(type){
         in.open(fileName, ios_base::in);
+        this->type = type;
     }
     else{
         out.open(fileName, ios_base::out | ios_base::app);
+        this->type = type;
+    }
+}
+
+bool File::isOpen(){
+    if(type){
+        if(in) return true;
+        else return false;
+    }
+    else{
+        if(out) return true;
+        else return false;
     }
 }
 
