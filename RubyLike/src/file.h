@@ -2,13 +2,18 @@
 #define FILE_H
 
 #include "Defs.h"
-
+/*
+ *  Classe que abre para leitura ou cria um arquivo
+ *  para escrita.
+ *  Usado pela classe Lex na producao de tokens
+ *
+ */
 class File
 {
     private:
-        ifstream in;
-        ofstream out;
-        int type;
+        ifstream in;    //se for arquivo de entrada
+        ofstream out;   //se for arquivo de saida
+        int type;       //tipo de abertura
 
     public:
         File(const char *fileName,int type);

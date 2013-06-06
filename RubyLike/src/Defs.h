@@ -9,8 +9,11 @@
 #include <QList>
 
 using namespace std;
-
-#define FIM         256
+/*
+ *  Definiçoes para identificaçao de elementos da linguagem
+ *
+ */
+#define FIM         256 //fim do arquivo de entrada e da producao de tokens
 #define IDENTIFIER  257
 #define INTEGER     258
 #define ERRONEOUS   259

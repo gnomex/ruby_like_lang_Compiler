@@ -1,13 +1,17 @@
 #ifndef TOKENTYPE_H
 #define TOKENTYPE_H
 
+/*
+ *  Classe para representar um token
+ *
+ */
 class TokenType
 {
     private:
-        char classe;
-        char *repr;
-        int line;
-        int column;
+        char classe;    //tipo de token
+        char *repr;     //token
+        int line;       //linha do arquivo
+        int column;     //coluna do arquivo
 
     public:
         TokenType();
