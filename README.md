@@ -2,9 +2,7 @@ Ruby-like language Compiler
 ====================
 	Academic work of the discipline of compilers
 
-
-
-Simple compiler
+Simple ruby based compiler
 ---------------------
 <p>
 	What it does
@@ -14,3 +12,11 @@ Simple compiler
 		<li>Semantic analysis</li>
 	</ul>
 </p>
+
+<p>
+## Features
+	Hybrid programming language
+	Object-Oriented paradigm
+	Dinamyc, Duck typing 
+</p>
+
