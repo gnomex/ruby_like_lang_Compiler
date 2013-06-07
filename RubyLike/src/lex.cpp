@@ -79,6 +79,7 @@ bool Lex::startLex(File& file) {
         dot = 0;
         inputChar = input[dot];
         cout<<"Entrada: "<<input<<" dot: "<<dot<<" inputChar: "<<(char)inputChar<<endl;
+        cin.get();
         list = ProducerList::getInstance(); //pega referencia da lista de produçoes
         return true;
     }
@@ -92,6 +93,8 @@ char* Lex::inputToZString (int iStart, int iLength) {
         ch[i] = input[i+iStart];
     }
     ch[i] = '\0';
+    cout<<"Token criado: "<<ch<<endl;
+    cin.get();
     return ch;
 }
 /*
@@ -99,7 +102,7 @@ char* Lex::inputToZString (int iStart, int iLength) {
  * Fim do arquivo, identificador, inteiro, operador, ou um erro
  */
 void Lex::getNextToken() {
-    TokenType *no = new TokenType(); //cria nova na lista
+    TokenType no; //cria nova na lista
     int startDot;
 
     skipLayoutAndComment();
@@ -110,29 +113,32 @@ void Lex::getNextToken() {
         return;
     }
     if (isEndOfInput(inputChar)) {
-        no->setClasse(FIM);
-        no->setToken("<FIM>");
+        no.setClasse(FIM);
+        no.setToken("<FIM>");
         return;
     }
     if (isLetter(inputChar)) {
-        recognizeIdentifier(no);
+        recognizeIdentifier(&no);
+        no.setToken(inputToZString(startDot, dot-startDot));
+        cout<<"Token produzido: "<<no.getToken()<<endl;
         getNextToken();
     }
     else if (isOperator(inputChar) || isSeparator(inputChar)) {
-        no->setClasse(inputChar);
+        no.setClasse(inputChar);
+        no.setToken(inputToZString(startDot, dot-startDot));
+        cout<<"Operador/Separador: "<<no.getClasse()<<endl;
         nextChar();
         getNextToken();
     }
     else if (isDigit(inputChar)) {
-        recognizeInteger(no);
+        recognizeInteger(&no);
+        no.setToken(inputToZString(startDot, dot-startDot));
         getNextToken();
     }
     else {
-        no->setClasse(ERRONEOUS);
+        no.setClasse(ERRONEOUS);
         nextChar();
     }
-    //copia o token do buffer
-    no->setToken(inputToZString(startDot, dot-startDot));
 
     list->insert(no); //nova entrada na lista
 }

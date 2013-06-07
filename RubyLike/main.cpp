@@ -9,11 +9,7 @@ int main(int argc, char *argv[])
 
     ProducerList *list = ProducerList::getInstance();
 
-    list->showValueAt(0);
-
-    list->showValueAt(4);
-
-    list->showValueAt(7);
+    list->showValues();
 
     cin.get();
 

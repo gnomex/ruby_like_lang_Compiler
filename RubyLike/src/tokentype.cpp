@@ -4,6 +4,9 @@ TokenType::TokenType()
 {
 }
 
+TokenType::~TokenType(){
+
+}
 /*
  *  Seta classe do token
  */
