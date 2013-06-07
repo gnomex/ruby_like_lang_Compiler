@@ -13,10 +13,9 @@ Simple ruby based compiler
 	</ul>
 </p>
 
-<p>
 ## Features
 	Hybrid programming language
 	Object-Oriented paradigm
 	Dinamyc, Duck typing 
-</p>
+
 
