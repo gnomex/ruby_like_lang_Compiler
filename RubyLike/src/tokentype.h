@@ -1,6 +1,7 @@
 #ifndef TOKENTYPE_H
 #define TOKENTYPE_H
 
+#include "Defs.h"
 /*
  *  Classe para representar um token
  *
@@ -9,7 +10,7 @@ class TokenType
 {
     private:
         char classe;    //tipo de token
-        char *repr;     //token
+        string repr;     //token
         int line;       //linha do arquivo
         int column;     //coluna do arquivo
 
@@ -17,11 +18,11 @@ class TokenType
         TokenType();
         ~TokenType();
         void setClasse(char classe);
-        void setToken(char *repr);
+        void setToken(string repr);
         void setLine(int line);
         void setColumn(int column);
         char getClasse();
-        char *getToken();
+        string getToken();
         int getLine();
         int getColumn();
 };

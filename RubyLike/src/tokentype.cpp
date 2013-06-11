@@ -17,7 +17,7 @@ void TokenType::setClasse(char classe)
 /*
  *  Seta token
  */
-void TokenType::setToken(char *repr){
+void TokenType::setToken(string repr){
     this->repr = repr;
 }
 /*
@@ -41,7 +41,7 @@ char TokenType::getClasse(){
 /*
  *  Recupera o token
  */
-char* TokenType::getToken(){
+string TokenType::getToken(){
     return repr;
 }
 /*

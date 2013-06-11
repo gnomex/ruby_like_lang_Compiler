@@ -75,7 +75,7 @@ void Lex::noteTokenPosition() {
 
 bool Lex::startLex(File& file) {
     input = file.readString(); //le uma linha do arquivo
-    if(input){
+    if(!input.empty()){
         dot = 0;
         inputChar = input[dot];
         cout<<"Entrada: "<<input<<" dot: "<<dot<<" inputChar: "<<(char)inputChar<<endl;
@@ -83,19 +83,21 @@ bool Lex::startLex(File& file) {
         list = ProducerList::getInstance(); //pega referencia da lista de produçoes
         return true;
     }
-    else return false;
+    return false;
 }
 
-char* Lex::inputToZString (int iStart, int iLength) {
+string Lex::inputToZString (int iStart, int iLength) {
     int i;
-    char *ch = (char *)malloc(sizeof(char) * (iLength+1));
+    //char *ch = (char *)malloc(sizeof(char) * (iLength+1));
+    string buffer;
     for (i = 0; i < iLength; i++) {
-        ch[i] = input[i+iStart];
+        //ch[i] = input[i+iStart];
+        buffer += input[i+iStart];
     }
-    ch[i] = '\0';
-    cout<<"Token criado: "<<ch<<endl;
+    //ch[i] = '\0';
+    cout<<"Token criado: "<<buffer<<endl;
     cin.get();
-    return ch;
+    return buffer;
 }
 /*
  * Le o buffer e classifica a entrada, podendo ser:

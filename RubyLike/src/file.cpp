@@ -4,14 +4,14 @@
  *  Type = 1 => leitura
  *  Type = 0 => escrita
  */
-File::File(const char *fileName, int type)
+File::File(const string& fileName, int type)
 {
     if(type){
-        in.open(fileName, ios_base::in);
+        in.open(fileName.c_str(), ios_base::in);
         this->type = type;
     }
     else{
-        out.open(fileName, ios_base::out | ios_base::app);
+        out.open(fileName.c_str(), ios_base::out | ios_base::app);
         this->type = type;
     }
 }
@@ -25,13 +25,13 @@ File::~File(){
  *  Type = 1 => leitura
  *  Type = 0 => escrita
  */
-void File::open(const char *fileName, int type){
+void File::open(const string& fileName, int type){
     if(type){
-        in.open(fileName, ios_base::in);
+        in.open(fileName.c_str(), ios_base::in);
         this->type = type;
     }
     else{
-        out.open(fileName, ios_base::out | ios_base::app);
+        out.open(fileName.c_str(), ios_base::out | ios_base::app);
         this->type = type;
     }
 }
@@ -64,15 +64,17 @@ char File::readChar(){
 /*
  *  Le uma linha do arquivo
  */
-char* File::readString(){
+string File::readString(){
     char *buffer = NULL;
+    string res;
 
     if(in){
         buffer = new char[255];
         in.read(buffer,254);
+        res = buffer;
     }
 
-    return buffer;
+    return res;
 }
 
 /*string* File::readString(){

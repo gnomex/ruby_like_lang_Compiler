@@ -1,7 +1,6 @@
 #ifndef LEX_H
 #define LEX_H
 
-#include "Defs.h"
 #include "file.h"
 #include "producerlist.h"
 #include "tablesymbol.h"
@@ -11,7 +10,7 @@ class Lex
 {
     private:
         ProducerList *list;
-        char *input;
+        string input;
         int dot;
         int inputChar;
 
@@ -20,7 +19,7 @@ class Lex
         void recognizeInteger(TokenType *no);
         void skipLayoutAndComment();
         void noteTokenPosition();
-        char* inputToZString (int iStart, int iLength);
+        string inputToZString(int iStart, int iLength);
         void getNextToken();
         bool startLex(File &file);
 

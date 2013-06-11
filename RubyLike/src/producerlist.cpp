@@ -24,7 +24,7 @@ void ProducerList::insert(TokenType i){
 /*
  *  Sera usado para saida (compilacao)
  */
-char* ProducerList::getString(){
+string ProducerList::getString(){
     //saida
 }
 /*
