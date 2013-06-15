@@ -16,7 +16,8 @@ class Lex
 
         void nextChar();
         void recognizeIdentifier(TokenType *no);
-        void recognizeInteger(TokenType *no);
+        void recognizeIntegerOrFloat(TokenType *no);
+        void recognizeList(TokenType *no);
         void skipLayoutAndComment();
         void noteTokenPosition();
         string inputToZString(int iStart, int iLength);

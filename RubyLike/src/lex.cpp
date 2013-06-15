@@ -12,9 +12,15 @@
 #define isDigit(ch)                         ('0' <= (ch) && (ch) <= '9')
 #define isLetterOrDigit(ch)                 (isLetter(ch) || isDigit(ch))
 #define isUnderscore(ch)                    ((ch) == '_')
+#define isDot(ch)                           ((ch) == '.')
 
 #define isOperator(ch)                      (strchr("+-*/", (ch)) != 0)
-#define isSeparator(ch)                     (strchr(",(){}=;", (ch)) != 0)
+#define isSeparator(ch)                     (strchr(",(){};!", (ch)) != 0)
+
+#define isAssign(ch)                        (strchr("=",(ch)) != 0)
+#define isLogicalOperator(ch)               (strchr("&|", (ch)) != 0)
+#define isMajor(ch)                         ((ch) == '>')
+#define isMinor(ch)                         ((ch) == '<')
 
 Lex::Lex()
 {
@@ -25,7 +31,6 @@ Lex::~Lex(){}
 
 void Lex::nextChar(){
     inputChar = input[++dot];
-    cout<<"nextChar: "<<(char)inputChar<<endl;
 }
 
 void Lex::recognizeIdentifier(TokenType *no) {
@@ -42,12 +47,16 @@ void Lex::recognizeIdentifier(TokenType *no) {
     }
 }
 
-void Lex::recognizeInteger(TokenType *no) {
+void Lex::recognizeIntegerOrFloat(TokenType *no) {
     no->setClasse(INTEGER);
     nextChar();
     while (isDigit(inputChar)) {
         nextChar();
-    }
+        if(isDot(inputChar)){
+            no->setClasse(FLOAT);
+            nextChar();
+        }
+    }    
 }
 
 void Lex::skipLayoutAndComment() {
@@ -125,14 +134,55 @@ void Lex::getNextToken() {
         cout<<"Token produzido: "<<no.getToken()<<endl;
         getNextToken();
     }
-    else if (isOperator(inputChar) || isSeparator(inputChar)) {
+    else if(isDoubleAssign()){
+        no.setClasse(IGUAL);
+        nextChar();
+        no.setToken(inputToZString(startDot, dot-startDot));
+        nextChar();
+        getNextToken();
+    }
+    else if(isMajor(inputChar)){
+        if(isAssign(input[dot+1])) {
+            nextChar();
+            no.setClasse(MAIOR_IGUAL);
+            no.setToken(inputToZString(startDot, dot-startDot));
+            nextChar();
+            getNextToken();
+            return;
+        }
+        else{
+            no.setClasse(MAIOR);
+            no.setToken(inputToZString(startDot, dot-startDot));
+            nextChar();
+            getNextToken();
+            return;
+        }
+    }
+    else if(isMinor(inputChar)){
+        if(isAssign(input[dot+1])) {
+            nextChar();
+            no.setClasse(MENOR_IGUAL);
+            no.setToken(inputToZString(startDot, dot-startDot));
+            nextChar();
+            getNextToken();
+            return;
+        }
+        else{
+            no.setClasse(MENOR);
+            no.setToken(inputToZString(startDot, dot-startDot));
+            nextChar();
+            getNextToken();
+            return;
+        }
+    }
+    else if (isOperator(inputChar) || isSeparator(inputChar) || isAssign(inputChar)) {
         no.setClasse(inputChar);
         no.setToken(inputToZString(startDot, dot-startDot));
         cout<<"Operador/Separador: "<<no.getClasse()<<endl;
         nextChar();
         getNextToken();
     }
-    else if (isDigit(inputChar)) {
+    else if (isDigit(inputChar)) { //pode ser int ou float
         recognizeInteger(&no);
         no.setToken(inputToZString(startDot, dot-startDot));
         getNextToken();
@@ -143,6 +193,13 @@ void Lex::getNextToken() {
     }
 
     list->insert(no); //nova entrada na lista
+}
+/*
+ *  Se for ==
+ */
+bool Lex::isDoubleAssign(){
+    if(input[dot] == '=' && input[dot-1] == '=') return true;
+    return false;
 }
 
 bool Lex::parser(File& file){

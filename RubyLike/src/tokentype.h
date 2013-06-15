@@ -9,10 +9,13 @@
 class TokenType
 {
     private:
-        char classe;    //tipo de token
-        string repr;     //token
-        int line;       //linha do arquivo
-        int column;     //coluna do arquivo
+        char classe;            //tipo de token
+        string repr;            //token
+        int line;               //linha do arquivo
+        int column;             //coluna do arquivo
+        TokenType *ref;         //referencia ao token que pertence
+        TokenType *initBlock;   //se for inicio de bloco {
+        TokenType *endBlock;    //se for fim do bloco
 
     public:
         TokenType();

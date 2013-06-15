@@ -20,7 +20,9 @@ SOURCES += main.cpp \
     src/tablesymbol.cpp \
     src/file.cpp \
     src/tokentype.cpp \
-    src/producerlist.cpp
+    src/producerlist.cpp \
+    src/syntactic.cpp \
+    src/semantic.cpp
 
 HEADERS += \
     src/lex.h \
@@ -28,4 +30,6 @@ HEADERS += \
     src/tablesymbol.h \
     src/file.h \
     src/tokentype.h \
-    src/producerlist.h
+    src/producerlist.h \
+    src/syntactic.h \
+    src/semantic.h
