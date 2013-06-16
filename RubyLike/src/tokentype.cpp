@@ -2,57 +2,139 @@
 
 TokenType::TokenType()
 {
+    ref = initBlock = endBlock = NULL;
+    statmentEnd = statmentInit = false;
 }
 
 TokenType::~TokenType(){
 
 }
-/*
- *  Seta classe do token
- */
+/*****************************************************************************************************
+ *  setClasse -> Classe to token (inteiro/float/identificador/lista)
+ *
+ ****************************************************************************************************/
 void TokenType::setClasse(char classe)
 {
     this->classe = classe;
 }
-/*
- *  Seta token
- */
+/*****************************************************************************************************
+ *  setToken -> Token
+ *
+ ****************************************************************************************************/
 void TokenType::setToken(string repr){
     this->repr = repr;
 }
-/*
- *  Seta linha do token no arquivo
- */
+/*****************************************************************************************************
+ *  setLine -> linha onde o token esta
+ *
+ ****************************************************************************************************/
 void TokenType::setLine(int line){
     this->line = line;
 }
-/*
- *  Seta coluna do token no arquivo
- */
+/*****************************************************************************************************
+ *  setColumn -> coluna onde o token inicia
+ *
+ ****************************************************************************************************/
 void TokenType::setColumn(int column){
     this->column = column;
 }
-/*
- *  Recupera classe do token
- */
+/*****************************************************************************************************
+ *  getClasse -> recupera classe do token
+ *
+ ****************************************************************************************************/
 char TokenType::getClasse(){
     return classe;
 }
-/*
- *  Recupera o token
- */
+/*****************************************************************************************************
+ *  getToken -> recupera o token
+ *
+ ****************************************************************************************************/
 string TokenType::getToken(){
     return repr;
 }
-/*
- *  Recupera a linha onde o token se encontra no arquivo
- */
+/*****************************************************************************************************
+ *  getLine -> retorna linha
+ *
+ ****************************************************************************************************/
 int TokenType::getLine(){
     return line;
 }
-/*
- *  Recupera a coluna do token no arquivo
- */
+/*****************************************************************************************************
+ *  getColumn -> retorna coluna
+ *
+ ****************************************************************************************************/
 int TokenType::getColumn(){
     return column;
+}
+/*****************************************************************************************************
+ *  setReference -> seta referencia para um token reservado (ex.: if)
+ *
+ ****************************************************************************************************/
+void TokenType::setReference(TokenType* ref){
+    this->ref = ref;
+}
+/*****************************************************************************************************
+ *  setInitBlock -> seta inicio do bloco para um token reservado
+ *
+ ****************************************************************************************************/
+void TokenType::setInitBlock(TokenType* init){
+    initBlock = init;
+}
+/*****************************************************************************************************
+ *  setEndBlock -> seta fim do bloco para um token reservado
+ *
+ ****************************************************************************************************/
+void TokenType::setEndBlock(TokenType* end){
+    endBlock = end;
+}
+/*****************************************************************************************************
+ *  getReference -> retorna referencia de algum token
+ *
+ ****************************************************************************************************/
+TokenType* TokenType::getReference(){
+    return ref;
+}
+/*****************************************************************************************************
+ *  getInitBlock -> retorna referencia para token de inicio de bloco
+ *
+ ****************************************************************************************************/
+TokenType* TokenType::getInitBlock(){
+    return initBlock;
+}
+/*****************************************************************************************************
+ *  getEndBlock -> retorna referencia para token de fim de bloco
+ *
+ ****************************************************************************************************/
+TokenType* TokenType::getEndBlock(){
+    return endBlock;
+}
+/*****************************************************************************************************
+ *  setStatementInit -> seta token de inicio de expressao logica
+ *
+ ****************************************************************************************************/
+void TokenType::setStatmentInit(bool init){
+    statmentInit = init;
+}
+/*****************************************************************************************************
+ *  setStatementEnd -> seta token de fim de expressao logica
+ *
+ ****************************************************************************************************/
+void TokenType::setStatmentEnd(bool end){
+    statmentEnd = end;
+}
+/*****************************************************************************************************
+ *  getStatementInit ->
+ *  True => se existe inicio de expressao logica '('
+ *  False => se nao existe
+ ****************************************************************************************************/
+bool TokenType::getStatmentInit(){
+    return statmentInit;
+}
+/*****************************************************************************************************
+ *  getStatementEnd ->
+ *  True => se existe fim de expressao logica ')'
+ *  False => se nao existe
+ ****************************************************************************************************/
+bool TokenType::getStatmentEnd(){
+    return statmentEnd;
 }

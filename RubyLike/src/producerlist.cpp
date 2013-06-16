@@ -9,51 +9,78 @@ ProducerList::ProducerList(){
 ProducerList::~ProducerList(){
 
 }
-//  singleton
+/*****************************************************************************************************
+ *  getInstance -> retorna instancia unica da classe
+ *
+ ****************************************************************************************************/
 ProducerList* ProducerList::getInstance(){
     if(instance == NULL) instance = new ProducerList();
     return instance;
 }
 
-/*
- *  Insere um token na lista
- */
-void ProducerList::insert(TokenType i){
+/*****************************************************************************************************
+ *  insert -> insere novo token na lista de producoes
+ *
+ ****************************************************************************************************/
+void ProducerList::insert(TokenType *i){
     list.push_front(i);
 }
-/*
- *  Sera usado para saida (compilacao)
- */
+/*****************************************************************************************************
+ *  getString -> backend
+ *
+ ****************************************************************************************************/
 string ProducerList::getString(){
     //saida
 }
-/*
- *  Recupera um token da lista
- */
-TokenType ProducerList::getTokenOfList(int i){
-    return list.takeAt(i);
+/*****************************************************************************************************
+ *  getTokenOfList -> retorna token se existe na lista
+ *
+ ****************************************************************************************************/
+TokenType *ProducerList::getTokenOfList(string prod){
+    QList<TokenType*>::Iterator it;
+
+    for(it = list.begin(); it != list.end(); ++it){
+        TokenType *v = *it;
+        if(v->getToken() == prod) return v;
+    }
+    return NULL;
 }
-/*
- *  Mostra tokens da lista
- */
+/*****************************************************************************************************
+ *  showValues ->
+ *
+ ****************************************************************************************************/
 void ProducerList::showValues(){
-    QList<TokenType>::Iterator it;
+    QList<TokenType*>::Iterator it;
 
     cout<<"Numero de elementos na lista: "<<list.length()<<endl;
     for(it = list.begin(); it != list.end(); ++it){
-        TokenType v = *it;
-        cout<<"Classe: "<<v.getClasse()<<endl;
-        cout<<"Token: "<<v.getToken()<<endl;
+        TokenType *v = *it;
+        cout<<"Classe: "<<v->getClasse()<<endl;
+        cout<<"Token: "<<v->getToken()<<endl;
         cin.get();
     }
 }
-/*
- *  Mostra um token especifico
- */
+/*****************************************************************************************************
+ *  showValueAt ->
+ *
+ ****************************************************************************************************/
 void ProducerList::showValueAt(int index){
-    TokenType v = list.at(index);
+    TokenType *v = list.at(index);
 
     cout<<endl<<endl;
-    cout<<"Classe: "<<v.getClasse()<<endl;
-    cout<<"Token: "<<v.getToken()<<endl;
+    cout<<"Classe: "<<v->getClasse()<<endl;
+    cout<<"Token: "<<v->getToken()<<endl;
+}
+/*****************************************************************************************************
+ *  isProducer -> verifica se existe um token na lista
+ *  True => existe
+ *  False => ...
+ ****************************************************************************************************/
+bool ProducerList::isProducer(string prod){
+    QList<TokenType*>::Iterator it;
+
+    for(it = list.begin(); it != list.end(); ++it){
+        TokenType *v = *it;
+        if(v->getToken() == prod) return true;
+    }
 }

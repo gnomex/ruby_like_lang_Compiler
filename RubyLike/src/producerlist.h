@@ -10,13 +10,14 @@ class ProducerList
 {
     private:
         static ProducerList* instance;  //singleton
-        QList<TokenType> list;         //producoes
+        QList<TokenType*> list;         //producoes
         ProducerList();
     public:
         ~ProducerList();
         static ProducerList* getInstance(); //singleton
-        void insert(TokenType i);          //salva um token
-        TokenType getTokenOfList(int i);   //recupera um token
+        void insert(TokenType* i);          //salva um token
+        TokenType* getTokenOfList(string prod);   //recupera um token
+        bool isProducer(string prod);
         string getString();
         void showValues();
         void showValueAt(int index);

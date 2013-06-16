@@ -6,13 +6,15 @@
 class TableSymbol
 {
     private:
-        QHash<char*,bool> table;
+        static TableSymbol* instance;
+        QHash<const char*,bool> table;
         void initTable();
     public:
         TableSymbol();
         ~TableSymbol();
-        bool findSymbol(char *str);
+        bool findSymbol(string str);
         void showKeysValues();
+        static TableSymbol* getInstance();
 };
 
 #endif // TABLESYMBOL_H

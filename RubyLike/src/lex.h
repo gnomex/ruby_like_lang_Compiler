@@ -12,17 +12,29 @@ class Lex
         ProducerList *list;
         string input;
         int dot;
+        int startDot;
         int inputChar;
+        int line;
 
         void nextChar();
-        void recognizeIdentifier(TokenType *no);
-        void recognizeIntegerOrFloat(TokenType *no);
+        void recognizeIdentifier(TokenType* no);
+        void recognizeIntegerOrFloat(TokenType* no);
         void recognizeList(TokenType *no);
         void skipLayoutAndComment();
-        void noteTokenPosition();
         string inputToZString(int iStart, int iLength);
-        void getNextToken();
+        void getNextToken(TokenType* noStatement);
         bool startLex(File &file);
+        bool listBlock(TokenType* noStatement, TokenType* current);
+        void setAssign(int inputChar, TokenType* no);
+
+        bool isDoubleAssign();
+        void showError(int inputChar, const string msg);
+
+        //analise sintatica
+        void identifierErrors(int inputChar);
+        void digitErrors(int inputChar);
+        bool ifStatementBlock(TokenType* noStatement, TokenType* current);
+        void assignErrors(int inputChar);
 
     public:
         Lex();

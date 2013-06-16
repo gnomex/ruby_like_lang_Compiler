@@ -22,6 +22,12 @@ using namespace std;
 #define MAIOR_IGUAL 262
 #define MENOR_IGUAL 263
 #define IGUAL       264
-#define ERRONEOUS   265
+#define REFERENCIA  265
+#define BLOCO       266
+#define RESERVADO   267
+#define IF          268
+#define LIST        269
+#define ASSIGN      270
+#define ERRONEOUS   271
 
 #endif // DEFS_H
