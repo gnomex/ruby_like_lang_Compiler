@@ -12,6 +12,7 @@ class ProducerList
         static ProducerList* instance;  //singleton
         QList<TokenType*> list;         //producoes
         ProducerList();
+        string getTypeClass(int classe, int token);
     public:
         ~ProducerList();
         static ProducerList* getInstance(); //singleton

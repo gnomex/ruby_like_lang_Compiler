@@ -10,11 +10,13 @@ class Lex
 {
     private:
         ProducerList *list;
-        string input;
+        char *input;
         int dot;
         int startDot;
         int inputChar;
         int line;
+        bool ifstmt;
+        bool liststmt;
 
         void nextChar();
         void recognizeIdentifier(TokenType* no);
@@ -22,8 +24,8 @@ class Lex
         void recognizeList(TokenType *no);
         void skipLayoutAndComment();
         string inputToZString(int iStart, int iLength);
-        void getNextToken(TokenType* noStatement);
-        bool startLex(File &file);
+        bool getNextToken(TokenType* noStatement);
+
         bool listBlock(TokenType* noStatement, TokenType* current);
         void setAssign(int inputChar, TokenType* no);
 
@@ -31,7 +33,7 @@ class Lex
         void showError(int inputChar, const string msg);
 
         //analise sintatica
-        void identifierErrors(int inputChar);
+        void identifierErrors(int inputChar, TokenType *no);
         void digitErrors(int inputChar);
         bool ifStatementBlock(TokenType* noStatement, TokenType* current);
         void assignErrors(int inputChar);
@@ -40,7 +42,8 @@ class Lex
         Lex();
         ~Lex();
 
-        bool parser(File& file);
+        void parser();
+        void startLex(File &file);
 };
 
 #endif // LEX_H

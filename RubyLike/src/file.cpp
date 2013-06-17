@@ -64,17 +64,19 @@ char File::readChar(){
 /*
  *  Le uma linha do arquivo
  */
-string File::readString(){
+char* File::readString(){
     char *buffer = NULL;
-    string res;
+    in.seekg(0, ios_base::end);
+    int length = in.tellg();
+    in.seekg(0, ios_base::beg);
 
     if(in){
-        buffer = new char[255];
-        in.read(buffer,254);
-        res = buffer;
+        buffer = new char[length];
+        in.read(buffer,length);
+
     }
 
-    return res;
+    return buffer;
 }
 
 /*string* File::readString(){

@@ -54,7 +54,7 @@ void ProducerList::showValues(){
 
     cout<<"Numero de elementos na lista: "<<list.length()<<endl;
     cout<<"+------------------------------------------------------------------------------+"<<endl;
-    cout<<"Class:\tToken\tREF\tStmtInit\tStmtEnd\tBlockInit\tBlockEnd"<<endl;
+    cout<<"Class:\tToken\tREF\tStmtInit\\End\t\tBlockInit\\End"<<endl;
     cout<<"+------------------------------------------------------------------------------+"<<endl;
     for(it = list.begin(); it != list.end(); ++it){
         TokenType *v = *it;

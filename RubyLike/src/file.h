@@ -23,7 +23,7 @@ class File
         bool isOpen();
         void close();
         char readChar();
-        string readString();
+        char *readString();
         //string *readString();
         void writeData(string str);
 };

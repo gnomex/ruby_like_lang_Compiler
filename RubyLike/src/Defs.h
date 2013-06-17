@@ -28,6 +28,7 @@ using namespace std;
 #define IF          268
 #define LIST        269
 #define ASSIGN      270
-#define ERRONEOUS   271
+#define END_CMD     271
+#define ERRONEOUS   272
 
 #endif // DEFS_H

@@ -36,7 +36,14 @@ void TableSymbol::showKeysValues(){
  *
  ****************************************************************************************************/
 bool TableSymbol::findSymbol(string str){
-    return table.contains(str.c_str());
+    QHash<const char*,bool>::Iterator it;
+
+    for(it = table.begin(); it != table.end(); ++it){
+        string s = it.key();
+        cout<<s<<" == "<<str<<endl;
+        if(s == str) return true;
+    }
+    return false;
 }
 /*****************************************************************************************************
  *  getIntance -> retorna instancia unica da classe

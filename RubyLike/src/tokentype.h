@@ -9,7 +9,7 @@
 class TokenType
 {
     private:
-        char classe;            //tipo de token
+        int classe;            //tipo de token
         string repr;            //token
         int line;               //linha do arquivo
         int column;             //coluna do arquivo
@@ -22,11 +22,11 @@ class TokenType
     public:
         TokenType();
         ~TokenType();
-        void setClasse(char classe);
+        void setClasse(int classe);
         void setToken(string repr);
         void setLine(int line);
         void setColumn(int column);
-        char getClasse();
+        int getClasse();
         string getToken();
         int getLine();
         int getColumn();

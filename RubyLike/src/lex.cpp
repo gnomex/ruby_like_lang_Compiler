@@ -1,6 +1,6 @@
 #include "lex.h"
 
-#define isEndOfLine(ch)                     ((ch) == '\n')
+#define isEndOfLine(ch)                     ((ch) == ';')
 #define isEndOfInput(ch)                    ((ch) == '\0')
 #define isLayout(ch)                        (!isEndOfInput(ch) && (ch) <= ' ')
 #define isCommentStarter(ch)                ((ch) == '#')
@@ -26,6 +26,8 @@
 Lex::Lex()
 {
     line = 0;
+    ifstmt = false;
+    liststmt = false;
 }
 
 Lex::~Lex(){}
@@ -49,8 +51,6 @@ void Lex::recognizeIdentifier(TokenType* no) {
             nextChar();
         }
     }
-    //verifica erros
-    identifierErrors(inputChar);
     //se n~ao tiver erros
     no->setLine(line);
     no->setColumn(startDot);
@@ -59,19 +59,24 @@ void Lex::recognizeIdentifier(TokenType* no) {
     //se for palavra reservada
     if(TableSymbol::getInstance()->findSymbol(no->getToken().c_str())){
         no->setClasse(IF);
+        ifstmt = true;
         return;
     }
+
     //se ja existir o token
     if(list->isProducer(no->getToken())){
         no->setClasse(REFERENCIA);
         no->setReference(list->getTokenOfList(no->getToken()));
     }
+    //verifica erros
+    identifierErrors(inputChar, no);
+
 }
 /*****************************************************************************************************
  *  identifierErrors -> Faz analise sintatica do identificador
  *
  ****************************************************************************************************/
-void Lex::identifierErrors(int inputChar){
+void Lex::identifierErrors(int inputChar, TokenType* no){
     if(isOperator(inputChar)) {
         //se apos um identificador vier operador logico e tiver caracteres invalidos
         if(isDot(input[dot + 1]) || isSeparator(input[dot + 1])
@@ -81,7 +86,9 @@ void Lex::identifierErrors(int inputChar){
 
     }
     if(isSeparator(inputChar)) {
-        if(inputChar != ';') showError(inputChar, " Letra ou numero ou underscore esperado mas: ");
+        if(inputChar != ';' && no->getClasse() != IF && !ifstmt) showError(inputChar, " Letra ou numero ou underscore esperado mas: ");
+        //if(inputChar != ';' && no->getClasse() != IF &&!liststmt) showError(inputChar, " Letra ou numero ou underscore esperado mas: ");
+        //else showError(inputChar, " Letra ou numero ou underscore esperado mas: ");
     }
     if(isDot(inputChar)) showError(inputChar, " Letra ou numero ou underscore esperado mas: ");
     if(isMajor(inputChar)) {
@@ -130,7 +137,9 @@ void Lex::recognizeIntegerOrFloat(TokenType* no) {
  ****************************************************************************************************/
 void Lex::digitErrors(int inputChar){
     if(isLetter(inputChar)) showError(inputChar, " digitor esperado mas: ");
-    if(isSeparator(inputChar) && inputChar != ';') showError(inputChar, " digitor esperado mas: ");
+    if(isSeparator(inputChar) && inputChar != ';') {
+        if(!liststmt && inputChar != ',' && inputChar != '(' && inputChar != ')') showError(inputChar, " digitor esperado mas: ");
+    }
     if(isAssign(inputChar)) showError(inputChar, " digitor esperado mas: ");
     if(isUnderscore(inputChar)) showError(inputChar, " digitor esperado mas: ");
 }
@@ -141,7 +150,8 @@ void Lex::digitErrors(int inputChar){
  *
  ****************************************************************************************************/
 void Lex::showError(int inputChar,const string msg){
-    cout<<"Erro na linha: "<<(line+1)<<" coluna: "<<(dot+1)<<msg<<inputChar<<" encontrado!"<<endl;
+    cout<<"Erro na linha: "<<(line+1)<<" coluna: "<<(dot+1)<<msg<<(char)inputChar<<" encontrado!"<<endl;
+    cin.get();
     exit(1);
 }
 /*****************************************************************************************************
@@ -171,17 +181,19 @@ void Lex::skipLayoutAndComment() {
  *  necessarias
  *
  ****************************************************************************************************/
-bool Lex::startLex(File& file) {
+void Lex::startLex(File& file) {
     input = file.readString(); //le uma linha do arquivo
-    if(!input.empty()){
+    if(input){
         dot = 0;
         inputChar = input[dot];
-        //cout<<"Entrada: "<<input<<" dot: "<<dot<<" inputChar: "<<(char)inputChar<<endl;
-        //cin.get();
+        cout<<"Entrada: "<<input<<" dot: "<<dot<<" inputChar: "<<(char)inputChar<<endl;
         list = ProducerList::getInstance(); //pega referencia da lista de produçoes
-        return true;
     }
-    return false;
+    else{
+        cout<<"Erro na leitura do arquivo!"<<endl;
+        cin.get();
+        exit(1);
+    }
 }
 /*****************************************************************************************************
  *  inputToZString -> Copia uma substring de uma string
@@ -190,15 +202,13 @@ bool Lex::startLex(File& file) {
  ****************************************************************************************************/
 string Lex::inputToZString (int iStart, int iLength) {
     int i;
-    //char *ch = (char *)malloc(sizeof(char) * (iLength+1));
     string buffer;
     for (i = 0; i < iLength; i++) {
-        //ch[i] = input[i+iStart];
         buffer += input[i+iStart];
     }
-    //ch[i] = '\0';
-    //cout<<"Token criado: "<<buffer<<endl;
-    //cin.get();
+
+    cout<<"Token criado: "<<buffer<<endl;
+    cin.get();
     return buffer;
 }
 /*****************************************************************************************************
@@ -214,21 +224,28 @@ string Lex::inputToZString (int iStart, int iLength) {
  *  Se for Operador/Separador
  *  Se for digito               constante
  ****************************************************************************************************/
-void Lex::getNextToken(TokenType* noStatement) {
+bool Lex::getNextToken(TokenType* noStatement) {
     TokenType *no = new TokenType(); //cria novo token
+    no->setInitBlock(NULL);
+    no->setEndBlock(NULL);
+    no->setReference(NULL);
 
     skipLayoutAndComment();
     startDot = dot;
 
     if(isEndOfLine(inputChar)){
+        no->setClasse(END_CMD);
+        no->setToken(";");
+        list->insert(no);
+        nextChar();
         line++;
-        return;
+        return false;   //libera a pilha
     }
     if (isEndOfInput(inputChar)) {
         no->setClasse(FIM);
         no->setToken("<FIM>");
         list->insert(no);
-        return;
+        return true; //fim do arquivo
     }
     if (isLetter(inputChar)) {
         recognizeIdentifier(no);
@@ -236,8 +253,8 @@ void Lex::getNextToken(TokenType* noStatement) {
         list->insert(no);
 
         //se if
-        if(no->getClasse() == IF) getNextToken(no); //recursao
-        else getNextToken(NULL);
+        if(no->getClasse() == IF) return getNextToken(no); //recursao
+        else return getNextToken(NULL);
     }
     else if(isDoubleAssign()){
         no->setClasse(IGUAL);
@@ -245,8 +262,8 @@ void Lex::getNextToken(TokenType* noStatement) {
         no->setToken(inputToZString(startDot, dot-startDot));
         list->insert(no);
         nextChar();
-        if(noStatement) getNextToken(noStatement);
-        else getNextToken(NULL);
+        if(noStatement) return getNextToken(noStatement);
+        else return getNextToken(NULL);
     }
     else if(isMajor(inputChar)){
         if(isAssign(input[dot+1])) {
@@ -255,18 +272,16 @@ void Lex::getNextToken(TokenType* noStatement) {
             no->setToken(inputToZString(startDot, dot-startDot));
             list->insert(no);
             nextChar();
-            if(noStatement) getNextToken(noStatement);
-            else getNextToken(NULL);
-            return;
+            if(noStatement) return getNextToken(noStatement);
+            else return getNextToken(NULL);
         }
         else{
             no->setClasse(MAIOR);
             no->setToken(inputToZString(startDot, dot-startDot));
             list->insert(no);
             nextChar();
-            if(noStatement) getNextToken(noStatement);
-            else getNextToken(NULL);
-            return;
+            if(noStatement) return getNextToken(noStatement);
+            else return getNextToken(NULL);
         }
     }
     else if(isMinor(inputChar)){
@@ -276,32 +291,30 @@ void Lex::getNextToken(TokenType* noStatement) {
             no->setToken(inputToZString(startDot, dot-startDot));
             list->insert(no);
             nextChar();
-            if(noStatement) getNextToken(noStatement);
-            else getNextToken(NULL);
-            return;
+            if(noStatement) return getNextToken(noStatement);
+            else return getNextToken(NULL);
         }
         else{
             no->setClasse(MENOR);
             no->setToken(inputToZString(startDot, dot-startDot));
             list->insert(no);
             nextChar();
-            if(noStatement) getNextToken(noStatement);
-            else getNextToken(NULL);
-            return;
+            if(noStatement) return getNextToken(noStatement);
+            else return getNextToken(NULL);
         }
     }
     else if(isAssign(inputChar)){
         setAssign(inputChar, no);
         list->insert(no);
         nextChar();
-        getNextToken(NULL);
+        return getNextToken(NULL);
     }
     else if(isTil(inputChar)){
         //lista
         no->setClasse(LIST);
         no->setToken(inputToZString(startDot, dot-startDot));
         nextChar();
-        getNextToken(no);
+        return getNextToken(no);
     }
     else if (isOperator(inputChar) || isSeparator(inputChar)) {
         no->setClasse(inputChar);
@@ -311,31 +324,32 @@ void Lex::getNextToken(TokenType* noStatement) {
             if(noStatement->getClasse() == IF && !ifStatementBlock(noStatement, no)){
                 list->insert(no);
                 nextChar();
-                getNextToken(noStatement);
+                return getNextToken(noStatement);
             }
             else if(noStatement->getClasse() == LIST && !listBlock(noStatement, no)){
                 list->insert(no);
                 nextChar();
-                getNextToken(noStatement);
+                return getNextToken(noStatement);
             }
         }
         else{
             list->insert(no);
             nextChar();
-            getNextToken(NULL);
+            return getNextToken(NULL);
         }
     }
     else if (isDigit(inputChar)) { //pode ser int ou float
         recognizeIntegerOrFloat(no);
         list->insert(no);
-        if(noStatement) getNextToken(noStatement);
-        else getNextToken(NULL);
+        if(noStatement) return getNextToken(noStatement);
+        else return getNextToken(NULL);
     }
-    else {
+    /*else {
         no->setClasse(ERRONEOUS);
         list->insert(no);
         nextChar();
-    }
+        return false;
+    }*/
 
     //list->insert(no); //nova entrada na lista
 }
@@ -392,6 +406,7 @@ bool Lex::listBlock(TokenType* noStatement, TokenType* current){
  *
  ****************************************************************************************************/
 bool Lex::ifStatementBlock(TokenType* noStatement, TokenType* current){
+
     if(!noStatement->getStatmentInit()){
         if(inputChar == '(') noStatement->setStatmentInit(true);
         else showError(inputChar, " ( esperado mas: ");
@@ -410,6 +425,7 @@ bool Lex::ifStatementBlock(TokenType* noStatement, TokenType* current){
             if(inputChar == '}') {
                 noStatement->setEndBlock(current);
                 nextChar();//proximo caractere para continuar
+                ifstmt = false;
                 return true; //sai da criacao do if(<expr>){<block>}
             }
             //se nao continua pegando os comandos do bloco
@@ -429,12 +445,13 @@ bool Lex::isDoubleAssign(){
 }
 /*****************************************************************************************************
  *  Parser -> inicia a producao de tokens e analise sintatica
- *  Pega linha pro linha do arquivo de entrada e produz os tokens
+ *  Primeiro chama startLex() que seta todas as informacoes necessarias
+ *  Segundo chama getNextToken(NULL) que vai quebrando e empilhando os tokens
+ *  quando acha ';' retorna um false (nao e´ o fim do arquivo)
+ *  e quando for true - fim do arquivo
  ****************************************************************************************************/
-bool Lex::parser(File& file){
-    if(startLex(file)){
-        getNextToken(NULL);
-        return true;
-    }
-    return false;
+void Lex::parser(){
+
+    while(!getNextToken(NULL));
+
 }

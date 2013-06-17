@@ -13,7 +13,7 @@ TokenType::~TokenType(){
  *  setClasse -> Classe to token (inteiro/float/identificador/lista)
  *
  ****************************************************************************************************/
-void TokenType::setClasse(char classe)
+void TokenType::setClasse(int classe)
 {
     this->classe = classe;
 }
@@ -42,7 +42,7 @@ void TokenType::setColumn(int column){
  *  getClasse -> recupera classe do token
  *
  ****************************************************************************************************/
-char TokenType::getClasse(){
+int TokenType::getClasse(){
     return classe;
 }
 /*****************************************************************************************************
