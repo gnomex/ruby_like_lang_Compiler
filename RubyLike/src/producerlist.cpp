@@ -54,35 +54,40 @@ void ProducerList::showValues(){
 
     cout<<"Numero de elementos na lista: "<<list.length()<<endl;
     cout<<"+------------------------------------------------------------------------------+"<<endl;
-    cout<<"Class:\tToken\tREF\tStmtInit\tStmtEnd\tBlockInit\tBlockEnd"<<endl;
+    cout<<"Classe:\t\tToken:\t\tLinha:\t\tColuna:"<<endl;
     cout<<"+------------------------------------------------------------------------------+"<<endl;
     for(it = list.begin(); it != list.end(); ++it){
         TokenType *v = *it;
-        cout<<getTypeClass(v->getClasse(), v->getClasse())
-           <<"\t"<<v->getToken()<<"\t"<<(v->getReference() == NULL? 0:1)<<"\t"<<v->getStatmentInit()
-           <<"\\"<<v->getStatmentEnd()<<"\t"<<(v->getInitBlock() == NULL? 0:1)<<"\\"<<(v->getEndBlock() == NULL? 0: 1)<<endl;
+        cout<<getTypeClass(v->getClasse())
+           <<"\t\t"<<v->getToken()<<"\t\t"<<v->getLine()<<"\t\t"<<v->getColumn()<<endl;
+        cin.get();
     }
-    cin.get();
+    cout<<"+------------------------------------------------------------------------------+"<<endl;
 }
 
-string ProducerList::getTypeClass(int classe, int token){
+string ProducerList::getTypeClass(int classe){
     switch(classe){
         case FIM: return "FIM";
         case IDENTIFIER: return "VAR";
         case INTEGER: return "INTEIRO";
         case FLOAT: return "REAL";
         case MAIOR: return ">";
-        case MENOR: return "<";
         case MAIOR_IGUAL: return ">=";
+        case MENOR: return "<";
         case MENOR_IGUAL: return "<=";
         case IGUAL: return "==";
-        case REFERENCIA: return "REF";
+        case NOT_EQUAL: return "!=";
+        case SEPARATOR: return "SEPAR";
         case BLOCO: return "{ ou }";
-        case RESERVADO: return "RESERVADOR";
+        case LOGICAL: return "LOGICO";
         case IF: return "IF";
         case LIST: return "LIST";
         case ASSIGN: return "=";
-        default: return ""+((char)token);
+        case SETA: return "->";
+        case END_CMD: return "!";
+        case LOOP: return "LOOP";
+        case OPERATOR: return "OP";
+        case STRING: return "String";
     }
 }
 /*****************************************************************************************************

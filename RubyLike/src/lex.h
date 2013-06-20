@@ -9,41 +9,22 @@
 class Lex
 {
     private:
-        ProducerList *list;
-        char *input;
-        int dot;
-        int startDot;
-        int inputChar;
-        int line;
-        bool ifstmt;
-        bool liststmt;
+        ProducerList    *list;
+        char            *input;
+        int             line;
+        int             column;
 
-        void nextChar();
-        void recognizeIdentifier(TokenType* no);
-        void recognizeIntegerOrFloat(TokenType* no);
-        void recognizeList(TokenType *no);
-        void skipLayoutAndComment();
-        string inputToZString(int iStart, int iLength);
-        bool getNextToken(TokenType* noStatement);
-
-        bool listBlock(TokenType* noStatement, TokenType* current);
-        void setAssign(int inputChar, TokenType* no);
-
-        bool isDoubleAssign();
-        void showError(int inputChar, const string msg);
-
-        //analise sintatica
-        void identifierErrors(int inputChar, TokenType *no);
-        void digitErrors(int inputChar);
-        bool ifStatementBlock(TokenType* noStatement, TokenType* current);
-        void assignErrors(int inputChar);
+        TokenType*      getToken();
+        void            recognizeIdentifier(TokenType* no);
+        void            recognizeIntegerOrFloat(TokenType* no);
+        void            skipLayoutAndComment();
 
     public:
         Lex();
         ~Lex();
 
-        void parser();
-        void startLex(File &file);
+        void            parser();
+        void            startLex(File &file);
 };
 
 #endif // LEX_H

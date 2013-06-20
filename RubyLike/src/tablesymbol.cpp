@@ -45,6 +45,7 @@ bool TableSymbol::findSymbol(string str){
     }
     return false;
 }
+
 /*****************************************************************************************************
  *  getIntance -> retorna instancia unica da classe
  *

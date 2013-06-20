@@ -22,13 +22,18 @@ using namespace std;
 #define MAIOR_IGUAL 262
 #define MENOR_IGUAL 263
 #define IGUAL       264
-#define REFERENCIA  265
-#define BLOCO       266
-#define RESERVADO   267
-#define IF          268
-#define LIST        269
-#define ASSIGN      270
-#define END_CMD     271
-#define ERRONEOUS   272
+#define NOT_EQUAL   265
+#define SEPARATOR   266
+#define BLOCO       267
+#define SETA        268
+#define IF          269
+#define LIST        270
+#define ASSIGN      271
+#define END_CMD     272
+#define LOOP        273
+#define OPERATOR    274
+#define STRING      275
+#define LOGICAL     276
+#define ERRONEOUS   277
 
 #endif // DEFS_H

@@ -2,8 +2,8 @@
 
 TokenType::TokenType()
 {
-    ref = initBlock = endBlock = NULL;
-    statmentEnd = statmentInit = false;
+    //ref = initBlock = endBlock = NULL;
+    //statmentEnd = statmentInit = false;
 }
 
 TokenType::~TokenType(){
@@ -70,71 +70,71 @@ int TokenType::getColumn(){
  *  setReference -> seta referencia para um token reservado (ex.: if)
  *
  ****************************************************************************************************/
-void TokenType::setReference(TokenType* ref){
+/*void TokenType::setReference(TokenType* ref){
     this->ref = ref;
-}
+}*/
 /*****************************************************************************************************
  *  setInitBlock -> seta inicio do bloco para um token reservado
  *
  ****************************************************************************************************/
-void TokenType::setInitBlock(TokenType* init){
+/*void TokenType::setInitBlock(TokenType* init){
     initBlock = init;
-}
+}*/
 /*****************************************************************************************************
  *  setEndBlock -> seta fim do bloco para um token reservado
  *
  ****************************************************************************************************/
-void TokenType::setEndBlock(TokenType* end){
+/*void TokenType::setEndBlock(TokenType* end){
     endBlock = end;
-}
+}*/
 /*****************************************************************************************************
  *  getReference -> retorna referencia de algum token
  *
  ****************************************************************************************************/
-TokenType* TokenType::getReference(){
+/*TokenType* TokenType::getReference(){
     return ref;
-}
+}*/
 /*****************************************************************************************************
  *  getInitBlock -> retorna referencia para token de inicio de bloco
  *
  ****************************************************************************************************/
-TokenType* TokenType::getInitBlock(){
+/*TokenType* TokenType::getInitBlock(){
     return initBlock;
-}
+}*/
 /*****************************************************************************************************
  *  getEndBlock -> retorna referencia para token de fim de bloco
  *
  ****************************************************************************************************/
-TokenType* TokenType::getEndBlock(){
+/*TokenType* TokenType::getEndBlock(){
     return endBlock;
-}
+}*/
 /*****************************************************************************************************
  *  setStatementInit -> seta token de inicio de expressao logica
  *
  ****************************************************************************************************/
-void TokenType::setStatmentInit(bool init){
+/*void TokenType::setStatmentInit(bool init){
     statmentInit = init;
-}
+}*/
 /*****************************************************************************************************
  *  setStatementEnd -> seta token de fim de expressao logica
  *
  ****************************************************************************************************/
-void TokenType::setStatmentEnd(bool end){
+/*void TokenType::setStatmentEnd(bool end){
     statmentEnd = end;
-}
+}*/
 /*****************************************************************************************************
  *  getStatementInit ->
  *  True => se existe inicio de expressao logica '('
  *  False => se nao existe
  ****************************************************************************************************/
-bool TokenType::getStatmentInit(){
+/*bool TokenType::getStatmentInit(){
     return statmentInit;
-}
+}*/
 /*****************************************************************************************************
  *  getStatementEnd ->
  *  True => se existe fim de expressao logica ')'
  *  False => se nao existe
  ****************************************************************************************************/
-bool TokenType::getStatmentEnd(){
+/*bool TokenType::getStatmentEnd(){
     return statmentEnd;
-}
+}*/

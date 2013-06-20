@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    File file("text.txt", 1);
+    File file("srctest.rb", 1);
     Lex lex;
 
     lex.startLex(file);
