@@ -124,13 +124,19 @@ void Lex::skipLayoutAndComment() {
 void Lex::startLex(File& file) {
     input = file.readString(); //le uma linha do arquivo
     if(input){
-        list = ProducerList::getInstance(); //pega referencia da lista de produçoes
+        ast = AST::getInstance();
     }
     else{
         cout<<"Erro na leitura do arquivo!"<<endl;
         cin.get();
         exit(1);
     }
+}
+
+void Lex::showError(const string msg){
+    cout<<"Erro na linha: "<<(line+1)<<" coluna: "<<(column+1)<<msg<<*input<<" encontrado!"<<endl;
+    cin.get();
+    exit(1);
 }
 
 /*****************************************************************************************************
@@ -141,14 +147,69 @@ void Lex::startLex(File& file) {
  *  e quando for true - fim do arquivo
  ****************************************************************************************************/
 void Lex::parser(){
-    TokenType *token;
+    TokenType *token, *buffer;
+    Attrib *attrib;
 
     while( (token = getToken()) != NULL){
-        list->insert(token);
+        switch(token->getClasse()){
+            case IDENTIFIER://eh identificador
+                buffer = getToken();
+
+                switch (buffer->getClasse()) {
+                    case ASSIGN://eh atribuicao
+                        attrib = new Attrib();
+                        attrib->setAttrib(buffer); //cria token atribuicao
+                        attrib->setIdentificador(token); //seta identificador a esquerda
+
+                        buffer = getToken();
+
+                        switch(buffer->getClasse()){
+                            case INTEGER:
+                                attrib->setExpression(buffer); //seta constante a direita
+                                buffer = getToken();
+                                switch(buffer->getClasse()){
+                                    case END_CMD: ast->insere(attrib); break; //se for ! coloca na AST
+                                    default: showError(" ! esperado mas: ");
+                                }
+                                break;
+                            case FLOAT:
+                                attrib->setExpression(buffer);
+                                buffer = getToken();
+                                switch(buffer->getClasse()){
+                                    case END_CMD: ast->insere(attrib); break;
+                                    default: showError(" ! esperado mas: ");
+                                }
+                                break;
+                            case STRING:
+                                attrib->setExpression(buffer);
+                                buffer = getToken();
+                                switch(buffer->getClasse()){
+                                    case END_CMD: ast->insere(attrib); break;
+                                    default: showError(" ! esperado mas: ");
+                                }
+                                break;
+                        }
+                        break;
+                    default:
+                        showError(" '=' esperado mas: ");
+                        break;
+                }
+                break;
+        }
+
         if(token->getClasse() == FIM) break;
+
     }
+
 }
 
+void Lex::show(){
+    Attrib *attrib = (Attrib*) ast->getRoot();
+
+    cout<<attrib->getIdentificador()->getToken()<<endl;
+    cout<<attrib->getToken()<<endl;
+    cout<<attrib->getExpression()->getToken()<<endl;
+}
 /*****************************************************************************************************
  *  getToken -> cria um token
  *

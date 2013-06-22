@@ -1,75 +1,59 @@
-#include "tokentype.h"
+#include "ifelse.h"
 
-TokenType::TokenType()
+IFElse::IFElse()
 {
-    next = NULL;
 }
 
-TokenType::~TokenType(){
-
-}
+IFElse::~IFElse(){}
 /*****************************************************************************************************
- *  setClasse -> Classe to token (inteiro/float/identificador/lista)
+ *  setIF -> seta token if
  *
  ****************************************************************************************************/
-void TokenType::setClasse(int classe)
-{
-    this->classe = classe;
+void IFElse::setIF(TokenType *_if){
+    setClasse(_if->getClasse());
+    setToken(_if->getToken());
+    setColumn(_if->getColumn());
+    setLine(_if->getLine());
 }
 /*****************************************************************************************************
- *  setToken -> Token
+ *  setExpression -> seta expressao logica a esquerda
  *
  ****************************************************************************************************/
-void TokenType::setToken(string repr){
-    this->repr = repr;
+void IFElse::setExpression(TokenType *expr){
+    this->expr = expr;
 }
 /*****************************************************************************************************
- *  setLine -> linha onde o token esta
+ *  setBlockIF -> seta o bloco do if no meio
  *
  ****************************************************************************************************/
-void TokenType::setLine(int line){
-    this->line = line;
+void IFElse::setBlockIF(TokenType *block){
+    this->block = block;
 }
 /*****************************************************************************************************
- *  setColumn -> coluna onde o token inicia
+ *  setElseBlock -> seta o bloco do else a direita
  *
  ****************************************************************************************************/
-void TokenType::setColumn(int column){
-    this->column = column;
+void IFElse::setElseBlock(TokenType *block){
+    this->elseBlock = block;
 }
 /*****************************************************************************************************
- *  getClasse -> recupera classe do token
+ *  getExpression -> retorna expressao logica a esquerda
  *
  ****************************************************************************************************/
-int TokenType::getClasse(){
-    return classe;
+TokenType* IFElse::getExpression(){
+    return expr;
 }
 /*****************************************************************************************************
- *  getToken -> recupera o token
+ *  getBlockIF -> retorna bloco do if (meio)
  *
  ****************************************************************************************************/
-string TokenType::getToken(){
-    return repr;
+TokenType* IFElse::getBlockIF(){
+    return block;
 }
 /*****************************************************************************************************
- *  getLine -> retorna linha
+ *  getElseBlock -> retorna bloco do else
  *
  ****************************************************************************************************/
-int TokenType::getLine(){
-    return line;
-}
-/*****************************************************************************************************
- *  getColumn -> retorna coluna
- *
- ****************************************************************************************************/
-int TokenType::getColumn(){
-    return column;
-}
-
-void TokenType::setNext(TokenType *no){
-    next = no;
-}
-
-TokenType* TokenType::getNext(){
-    return next;
+TokenType* IFElse::getElseBlock(){
+    return elseBlock;
 }

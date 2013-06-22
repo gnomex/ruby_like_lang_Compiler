@@ -20,7 +20,12 @@ SOURCES += main.cpp \
     src/tablesymbol.cpp \
     src/file.cpp \
     src/tokentype.cpp \
-    src/producerlist.cpp
+    src/producerlist.cpp \
+    src/attrib.cpp \
+    src/ast.cpp \
+    src/operator.cpp \
+    src/ifelse.cpp \
+    src/each.cpp
 
 HEADERS += \
     src/lex.h \
@@ -28,4 +33,9 @@ HEADERS += \
     src/tablesymbol.h \
     src/file.h \
     src/tokentype.h \
-    src/producerlist.h
+    src/producerlist.h \
+    src/attrib.h \
+    src/ast.h \
+    src/operator.h \
+    src/ifelse.h \
+    src/each.h

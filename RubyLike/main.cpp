@@ -2,18 +2,14 @@
 
 int main(int argc, char *argv[])
 {
-    File file("srctest.rb", 1);
+    File fp("attr.rb", 1);
     Lex lex;
 
-    lex.startLex(file);
-
+    lex.startLex(fp);
     lex.parser();
 
-    ProducerList *list = ProducerList::getInstance();
-
-    list->showValues();
+    lex.show();
 
     cin.get();
-
     return 0;
 }
