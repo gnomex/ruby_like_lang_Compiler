@@ -23,7 +23,7 @@ ProducerList* ProducerList::getInstance(){
  *
  ****************************************************************************************************/
 void ProducerList::insert(TokenType *i){
-    list.push_back(i);
+    if(!list.contains(i)) list.push_back(i);
 }
 /*****************************************************************************************************
  *  getString -> backend

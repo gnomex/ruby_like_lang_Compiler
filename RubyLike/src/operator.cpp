@@ -14,6 +14,7 @@ void Operator::setOperator(TokenType* opr){
     setToken(opr->getToken());
     setColumn(opr->getColumn());
     setLine(opr->getLine());
+    setType(opr->getType());
 }
 /*****************************************************************************************************
  *  setLeft -> seta expressao ou constante a esquerda

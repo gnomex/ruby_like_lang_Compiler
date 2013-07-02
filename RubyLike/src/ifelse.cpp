@@ -14,6 +14,7 @@ void IFElse::setIF(TokenType *_if){
     setToken(_if->getToken());
     setColumn(_if->getColumn());
     setLine(_if->getLine());
+    setType(_if->getType());
 }
 /*****************************************************************************************************
  *  setExpression -> seta expressao logica a esquerda

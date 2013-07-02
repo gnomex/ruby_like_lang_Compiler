@@ -16,8 +16,8 @@ TableSymbol::~TableSymbol(){
  ****************************************************************************************************/
 void TableSymbol::initTable(){
     table.insert("if", true);
-    table.insert("for", true);
-    table.insert("while", true);
+    table.insert("else", true);
+    table.insert("each", true);
     table.insert("puts", true);
     table.insert("print", true);
 }
@@ -40,7 +40,6 @@ bool TableSymbol::findSymbol(string str){
 
     for(it = table.begin(); it != table.end(); ++it){
         string s = it.key();
-        cout<<s<<" == "<<str<<endl;
         if(s == str) return true;
     }
     return false;

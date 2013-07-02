@@ -14,6 +14,7 @@ void Each::setEach(TokenType *each){
     setToken(each->getToken());
     setColumn(each->getColumn());
     setLine(each->getLine());
+    setType(each->getType());
 }
 /*****************************************************************************************************
  *  setExpression -> seta expressao logica a esquerda

@@ -6,24 +6,37 @@
 #define isCommentStarter(ch)                ((ch) == '#')
 #define isCommentStopper(ch)                ((ch) == '#' || (ch) == '\n')
 
-#define is_uc_letter(ch)                    ('A' <= (ch) && (ch) <= 'Z')
-#define is_lc_letter(ch)                    ('a' <= (ch) && (ch) <= 'z')
+#define UC_LETTER_MASK                      (1<<1)
+#define LC_LETTER_MASK                      (1<<2)
+#define is_uc_letter(ch)                    (charbits[(int)ch] & UC_LETTER_MASK)
+#define is_lc_letter(ch)                    (charbits[(int)ch] & LC_LETTER_MASK)
 #define isLetter(ch)                        (is_uc_letter(ch) || is_lc_letter(ch))
 #define isDigit(ch)                         ('0' <= (ch) && (ch) <= '9')
 #define isLetterOrDigit(ch)                 (isLetter(ch) || isDigit(ch))
 #define isUnderscore(ch)                    ((ch) == '_')
 #define isDot(ch)                           ((ch) == '.')
 
-#define isOperator(ch)                      (strchr("+-*/", (ch)) != 0)
-#define isSeparator(ch)                     (strchr(",(){};!-", (ch)) != 0)
+//#define isOperator(ch)                      (strchr("+-*/", (ch)) != 0)
+//#define isSeparator(ch)                     (strchr(",(){};!-", (ch)) != 0)
 
-#define isAssign(ch)                        (strchr("=",(ch)) != 0)
-#define isLogicalOperator(ch)               (strchr("&|", (ch)) != 0)
-#define isMajor(ch)                         ((ch) == '>')
-#define isMinor(ch)                         ((ch) == '<')
-#define isTil(ch)                           ((ch) == '~')
-#define isP(ch)                             ((ch) == '(')
-#define isString(ch)                        (strchr("'", (ch)) != 0)
+//#define isAssign(ch)                        (strchr("=",(ch)) != 0)
+//#define isLogicalOperator(ch)               (strchr("&|", (ch)) != 0)
+//#define isMajor(ch)                         ((ch) == '>')
+//#define isMinor(ch)                         ((ch) == '<')
+//#define isTil(ch)                           ((ch) == '~')
+//#define isP(ch)                             ((ch) == '(')
+//#define isString(ch)                        (strchr("'", (ch)) != 0)
+
+
+static const char charbits[256] = {
+0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,
+0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0040,0040,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0002,0002,0002,0002,0002,0002,0002,
+0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0002,0000,0000,0000,0000,0000,0000,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,
+0004,0004,0004,0004,0004,0004,0004,0004,0004,0004,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,
+0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,
+0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,
+0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000
+};
 
 Lex::Lex()
 {
@@ -58,6 +71,8 @@ void Lex::recognizeIdentifier(TokenType* no) {
         }
     }
 
+    //se for if, each
+    if(reser->findSymbol(s)) no->setClasse(RESERVADO);
     no->setToken(s);
 }
 
@@ -67,6 +82,7 @@ void Lex::recognizeIdentifier(TokenType* no) {
  ****************************************************************************************************/
 void Lex::recognizeIntegerOrFloat(TokenType* no) {
     no->setClasse(INTEGER);
+    no->setType(CONST);
     no->setColumn(column);
     no->setLine(line);
     string s;
@@ -109,7 +125,8 @@ void Lex::skipLayoutAndComment() {
             column++;
         }
         input++;
-        column++;
+        line++;
+        column = 0;
         while (isLayout(*input)) {
             input++;
             column++;
@@ -123,93 +140,15 @@ void Lex::skipLayoutAndComment() {
  ****************************************************************************************************/
 void Lex::startLex(File& file) {
     input = file.readString(); //le uma linha do arquivo
-    if(input){
-        ast = AST::getInstance();
-    }
-    else{
+    if(!input){
         cout<<"Erro na leitura do arquivo!"<<endl;
         cin.get();
         exit(1);
     }
+
+    reser = TableSymbol::getInstance();
 }
 
-void Lex::showError(const string msg){
-    cout<<"Erro na linha: "<<(line+1)<<" coluna: "<<(column+1)<<msg<<*input<<" encontrado!"<<endl;
-    cin.get();
-    exit(1);
-}
-
-/*****************************************************************************************************
- *  Parser -> inicia a producao de tokens e analise sintatica
- *  Primeiro chama startLex() que seta todas as informacoes necessarias
- *  Segundo chama getNextToken(NULL) que vai quebrando e empilhando os tokens
- *  quando acha ';' retorna um false (nao e´ o fim do arquivo)
- *  e quando for true - fim do arquivo
- ****************************************************************************************************/
-void Lex::parser(){
-    TokenType *token, *buffer;
-    Attrib *attrib;
-
-    while( (token = getToken()) != NULL){
-        switch(token->getClasse()){
-            case IDENTIFIER://eh identificador
-                buffer = getToken();
-
-                switch (buffer->getClasse()) {
-                    case ASSIGN://eh atribuicao
-                        attrib = new Attrib();
-                        attrib->setAttrib(buffer); //cria token atribuicao
-                        attrib->setIdentificador(token); //seta identificador a esquerda
-
-                        buffer = getToken();
-
-                        switch(buffer->getClasse()){
-                            case INTEGER:
-                                attrib->setExpression(buffer); //seta constante a direita
-                                buffer = getToken();
-                                switch(buffer->getClasse()){
-                                    case END_CMD: ast->insere(attrib); break; //se for ! coloca na AST
-                                    default: showError(" ! esperado mas: ");
-                                }
-                                break;
-                            case FLOAT:
-                                attrib->setExpression(buffer);
-                                buffer = getToken();
-                                switch(buffer->getClasse()){
-                                    case END_CMD: ast->insere(attrib); break;
-                                    default: showError(" ! esperado mas: ");
-                                }
-                                break;
-                            case STRING:
-                                attrib->setExpression(buffer);
-                                buffer = getToken();
-                                switch(buffer->getClasse()){
-                                    case END_CMD: ast->insere(attrib); break;
-                                    default: showError(" ! esperado mas: ");
-                                }
-                                break;
-                        }
-                        break;
-                    default:
-                        showError(" '=' esperado mas: ");
-                        break;
-                }
-                break;
-        }
-
-        if(token->getClasse() == FIM) break;
-
-    }
-
-}
-
-void Lex::show(){
-    Attrib *attrib = (Attrib*) ast->getRoot();
-
-    cout<<attrib->getIdentificador()->getToken()<<endl;
-    cout<<attrib->getToken()<<endl;
-    cout<<attrib->getExpression()->getToken()<<endl;
-}
 /*****************************************************************************************************
  *  getToken -> cria um token
  *
@@ -233,6 +172,8 @@ TokenType* Lex::getToken(){
         token->setToken("<FIM>");
         token->setLine(line);
         token->setColumn(column);
+        token->setType(FIM);
+
         return token;
     }
 
@@ -243,7 +184,10 @@ TokenType* Lex::getToken(){
         else token->setToken("}");
         token->setColumn(column);
         token->setLine(line);
-        input++; column++;
+        token->setType(BLOCO);
+        input++;
+        line++;
+        column = 0;
 
         return token;
     }
@@ -258,6 +202,7 @@ TokenType* Lex::getToken(){
                     input++; input++; column++; column++;
                     token->setClasse(IGUAL);
                     token->setToken("==");
+                    token->setType(IGUAL);
                     return token;
                 }
                 break;
@@ -267,7 +212,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; input++; column++; column++;
                     token->setClasse(NOT_EQUAL);
+                    token->setType(NOT_EQUAL);
                     token->setToken("!=");
+
                     return token;
                 }
                 else{
@@ -275,7 +222,11 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; column++;
                     token->setClasse(END_CMD);
+                    token->setType(END_CMD);
                     token->setToken("!");
+                    line++;
+                    column = 0;
+
                     return token;
                 }
                 break;
@@ -285,7 +236,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; input++; column++; column++;
                     token->setClasse(SETA);
+                    token->setType(SETA);
                     token->setToken("->");
+
                     return token;
                 }
                 break;
@@ -295,7 +248,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; input++; column++; column++;
                     token->setClasse(MENOR_IGUAL);
+                    token->setType(MENOR_IGUAL);
                     token->setToken("<=");
+
                     return token;
                 }
                 else{
@@ -303,7 +258,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; column++;
                     token->setClasse(MENOR);
+                    token->setType(MENOR);
                     token->setToken("<");
+
                     return token;
                 }
                 break;
@@ -313,7 +270,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; input++; column++; column++;
                     token->setClasse(MAIOR_IGUAL);
+                    token->setType(MAIOR_IGUAL);
                     token->setToken(">=");
+
                     return token;
                 }
                 else{
@@ -321,7 +280,9 @@ TokenType* Lex::getToken(){
                     token->setLine(line);
                     input++; column++;
                     token->setClasse(MAIOR);
+                    token->setType(MAIOR);
                     token->setToken(">");
+
                     return token;
                 }
                 break;
@@ -331,6 +292,7 @@ TokenType* Lex::getToken(){
     //operadores logico
     if(strchr("|&",*input)){
         token->setClasse(LOGICAL);
+        token->setType(LOGICAL);
         switch(*input){
             case '|':
                 input++;
@@ -338,6 +300,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '&':
                 input++;
@@ -345,6 +308,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
         }
     }
@@ -352,6 +316,7 @@ TokenType* Lex::getToken(){
     //operadores
     if(strchr("+-*/%", *input)){
         token->setClasse(OPERATOR);
+        token->setType(OPERATOR);
         switch(*input){
             case '+':
                 input++;
@@ -359,6 +324,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '-':
                 input++;
@@ -366,6 +332,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '*':
                 input++;
@@ -373,6 +340,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '/':
                 input++;
@@ -380,6 +348,7 @@ TokenType* Lex::getToken(){
                 token->setLine(line);
                 token->setColumn(column);
                 column++;
+
                 return token;
             case '%':
                 input++;
@@ -387,6 +356,7 @@ TokenType* Lex::getToken(){
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
         }
     }
@@ -397,42 +367,52 @@ TokenType* Lex::getToken(){
             case '=':
                 input++;
                 token->setClasse(ASSIGN);
+                token->setType(ASSIGN);
                 token->setToken("=");
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '(':
                 input++;
                 token->setClasse(SEPARATOR);
+                token->setType(SEPARATOR);
                 token->setToken("(");
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case ')':
                 input++;
                 token->setClasse(SEPARATOR);
+                token->setType(SEPARATOR);
                 token->setToken(")");
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case ',':
                 input++;
                 token->setClasse(SEPARATOR);
+                token->setType(SEPARATOR);
                 token->setToken(",");
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
             case '~':
                 input++;
                 token->setClasse(LIST);
+                token->setType(LIST);
                 token->setToken("~");
                 token->setColumn(column);
                 token->setLine(line);
                 column++;
+
                 return token;
         }
     }
@@ -450,9 +430,11 @@ TokenType* Lex::getToken(){
             column++;
         }
         token->setClasse(STRING);
+        token->setType(STRING);
         token->setToken(s);
         input++; //sem isso buga por causa o ' ou " finalizando a string
         column++;
+
         return token;
     }
 
@@ -468,5 +450,13 @@ TokenType* Lex::getToken(){
         return token;
     }
 
-    return NULL; //algo sem sentido ou caractere de formataçao fdp
+    //se nao for token permitido entao eh erro
+    token->setClasse(ERRONEOUS);
+    string s;
+    s.push_back(*input);
+    token->setToken(s);
+    token->setLine(line);
+    token->setColumn(column);
+
+    return token; //token errado
 }

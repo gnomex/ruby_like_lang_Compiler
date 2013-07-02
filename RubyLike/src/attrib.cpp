@@ -8,7 +8,7 @@ Attrib::~Attrib(){
 
 }
 /*****************************************************************************************************
- *  setAttrib -> seta token de atribuicao
+ *  setAttrib -> seta informacoes do token '='
  *
  ****************************************************************************************************/
 void Attrib::setAttrib(TokenType* attrib){
@@ -16,30 +16,31 @@ void Attrib::setAttrib(TokenType* attrib){
     setToken(attrib->getToken());
     setColumn(attrib->getColumn());
     setLine(attrib->getLine());
+    setType(attrib->getType());
 }
 /*****************************************************************************************************
- *  setIdentificador -> seta variavel a esquerda da atribuicao
+ *  setIdentificador -> coloca a variavel a esquerda
  *
  ****************************************************************************************************/
 void Attrib::setIdentificador(TokenType* var){
     this->left = var;
 }
 /*****************************************************************************************************
- *  setExpression -> seta expressao matematica ou constante a direita
+ *  setExpression -> coloca a constante ou expressao a direita
  *
  ****************************************************************************************************/
 void Attrib::setExpression(TokenType* exp){
     this->right = exp;
 }
 /*****************************************************************************************************
- *  getIdentificador -> retorna variavel a esquerda
+ *  getIdentificador -> retorna variavel
  *
  ****************************************************************************************************/
 TokenType* Attrib::getIdentificador(){
     return left;
 }
 /*****************************************************************************************************
- *  getExpression -> retorna expressao matematica ou constante a direita
+ *  getExpression -> retorna constante ou expressao
  *
  ****************************************************************************************************/
 TokenType* Attrib::getExpression(){

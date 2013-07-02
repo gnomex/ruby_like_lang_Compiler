@@ -65,11 +65,35 @@ int TokenType::getLine(){
 int TokenType::getColumn(){
     return column;
 }
-
+/*****************************************************************************************************
+ *  setNext -> seta proximo token da AST
+ *  AST segundo o que entendi e a professora concordo, eh uma lista, em que cada item
+ *  eh uma arvore, com sub arvores......
+ *  Assim cada item eh uma raiz de uma arvore
+ *
+ ****************************************************************************************************/
 void TokenType::setNext(TokenType *no){
     next = no;
 }
-
+/*****************************************************************************************************
+ *  getNext -> retorna raiz de uma arvore da lista
+ *
+ ****************************************************************************************************/
 TokenType* TokenType::getNext(){
     return next;
+}
+/*****************************************************************************************************
+ *  setType -> seta tipo dinamico na variavel, tambem usado na analise semantica
+ *  para ver se faz sentido comparacao ou operacao entre tipos
+ *
+ ****************************************************************************************************/
+void TokenType::setType(int type){
+    this->type = type;
+}
+/*****************************************************************************************************
+ *  getType -> retorna tipo atual do token
+ *
+ ****************************************************************************************************/
+int TokenType::getType(){
+    return type;
 }

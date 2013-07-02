@@ -3,30 +3,30 @@
 
 #include "file.h"
 #include "tokentype.h"
-#include "ast.h"
-#include "attrib.h"
+#include "error.h"
+#include "producerlist.h"
+#include "tablesymbol.h"
 
 class Lex
 {
     private:
-        AST             *ast;
+        Error*          erro;       //para mensagens de erros
+        TableSymbol*    reser;      //simbolos reservados
         char            *input;
         int             line;
         int             column;
 
-        TokenType*      getToken();
+
         void            recognizeIdentifier(TokenType* no);
         void            recognizeIntegerOrFloat(TokenType* no);
         void            skipLayoutAndComment();
-        void            showError(const string msg);
     public:
         Lex();
         ~Lex();
 
-        void            parser();
         void            startLex(File &file);
+        TokenType*      getToken();
 
-        void            show();
 };
 
 #endif // LEX_H

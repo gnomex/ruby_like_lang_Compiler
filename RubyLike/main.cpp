@@ -1,14 +1,15 @@
 #include "src/lex.h"
+#include "src/syntactic.h"
 
 int main(int argc, char *argv[])
 {
-    File fp("attr.rb", 1);
-    Lex lex;
+    File fp("srctest.rb", 1);
+    Lex *lex = new Lex();
+    lex->startLex(fp);
+    Syntactic syn(lex);
 
-    lex.startLex(fp);
-    lex.parser();
-
-    lex.show();
+    syn.parser();
+    syn.show();
 
     cin.get();
     return 0;

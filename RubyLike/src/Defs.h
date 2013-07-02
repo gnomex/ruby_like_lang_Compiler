@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QHash>
 #include <QList>
+#include <QStack>
 
 using namespace std;
 /*
@@ -34,6 +35,9 @@ using namespace std;
 #define OPERATOR    274
 #define STRING      275
 #define LOGICAL     276
-#define ERRONEOUS   277
+#define RESERVADO   277
+#define ERRONEOUS   278
+#define CONST       279
+#define NON_TYPE    -2
 
 #endif // DEFS_H

@@ -21,6 +21,7 @@ void AST::insere(TokenType *no){
 
     if( root == NULL ){
         root = no;
+        root->setNext(NULL);
     }
     else{
         TokenType *atual = root;
@@ -28,5 +29,6 @@ void AST::insere(TokenType *no){
         while(atual->getNext() != NULL) atual = atual->getNext();
 
         atual->setNext(no);
+        no->setNext(NULL);
     }
 }

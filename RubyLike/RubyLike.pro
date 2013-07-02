@@ -25,7 +25,10 @@ SOURCES += main.cpp \
     src/ast.cpp \
     src/operator.cpp \
     src/ifelse.cpp \
-    src/each.cpp
+    src/each.cpp \
+    src/tlist.cpp \
+    src/syntactic.cpp \
+    src/error.cpp
 
 HEADERS += \
     src/lex.h \
@@ -38,4 +41,7 @@ HEADERS += \
     src/ast.h \
     src/operator.h \
     src/ifelse.h \
-    src/each.h
+    src/each.h \
+    src/tlist.h \
+    src/syntactic.h \
+    src/error.h
