@@ -72,7 +72,11 @@ void Lex::recognizeIdentifier(TokenType* no) {
     }
 
     //se for if, each
-    if(reser->findSymbol(s)) no->setClasse(RESERVADO);
+    if(reser->findSymbol(s)){
+        no->setClasse(RESERVADO);
+        if(s == "if") no->setType(IF);
+        else no->setType(LOOP);
+    }
     no->setToken(s);
 }
 
