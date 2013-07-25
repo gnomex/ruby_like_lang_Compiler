@@ -39,34 +39,32 @@ void Semantic::review(TokenType *token){
             if(nott->getExpression()->getClasse() == OPERATOR){
                 Operator *optt = (Operator*)nott->getExpression();
                 nott->getIdentificador()->setType(reviewOperation(optt)); //seta tipo de acordo com reviewOperation
+
                 return;
             }
             else{ //constante ou variavel ou lista
-                nott->getIdentificador()->setClasse(nott->getExpression()->getClasse());
-                //no->getIdentificador()->setType(no->getExpression()->getType());
+                //nott->getIdentificador()->setClasse(nott->getExpression()->getClasse());
+                nott->getIdentificador()->setType(nott->getExpression()->getClasse());
                 return;
             }
         }
         break;
         case RESERVADO:
-            switch(token->getType()){
-                case IF:
-                {
-                    IFElse *noif = (IFElse *)token;
-                    Operator *opif = (Operator *)noif->getExpression();
-                    reviewOperation(opif); //verifica se os lados esquerdo e direito sao do mesmo tipo
-                    review(noif->getBlockIF()); //recursivamente verifica o bloco do IF
-                    review(noif->getElseBlock()); //recursivamente verifica o bloco do else
-                    return; //sai
-                }
-                case LOOP:
-                {
-                    Each *noch = (Each *)token;
-                    Operator *opch = (Operator *)noch->getExpression();
-                    reviewOperation(opch); //verifica se os lados esquerdo e direito sao do mesmo tipo
-                    review(noch->getBlock()); //recursivamente verifica o bloco
-                    return; //sai
-                }
+            if(token->getToken() == "if"){
+                IFElse *noif = (IFElse *)token;
+                Operator *opif = (Operator *)noif->getExpression();
+                reviewOperation(opif); //verifica se os lados esquerdo e direito sao do mesmo tipo
+                review(noif->getBlockIF()); //recursivamente verifica o bloco do IF
+                review(noif->getElseBlock()); //recursivamente verifica o bloco do else
+                return; //sai
+            }
+
+            if(token->getToken() == "each"){
+                Each *noch = (Each *)token;
+                Operator *opch = (Operator *)noch->getExpression();
+                reviewOperation(opch); //verifica se os lados esquerdo e direito sao do mesmo tipo
+                review(noch->getBlock()); //recursivamente verifica o bloco
+                return; //sai
             }
     }
 }
@@ -87,91 +85,69 @@ int Semantic::reviewOperation(Operator *op){
     switch(op->getLeft()->getClasse()){
         case IDENTIFIER: //se for variavel
             switch(op->getLeft()->getType()){ //se a esquerda for
-                case LIST:
-                    erro->showError(MSG_ERROR_LIST,
-                                    op->getLeft()->getLine(),
-                                    op->getLeft()->getColumn(),
-                                    op->getLeft()->getToken());
-                case FLOAT:
-                    if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != FLOAT)
-                        erro->showError(MSG_ERROR_FLOAT,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-                    else if(op->getRight()->getClasse() != FLOAT)
-                        erro->showError(MSG_ERROR_FLOAT,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-
-                    return FLOAT;
-                case INTEGER:
-                    if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != INTEGER)
-                        erro->showError(MSG_ERROR_INT,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-                    else if(op->getRight()->getClasse() != INTEGER)
-                        erro->showError(MSG_ERROR_INT,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-
-                    return INTEGER;
-                case STRING:
-                    if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != STRING)
-                        erro->showError(MSG_ERROR_STRING,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-                    else if(op->getRight()->getClasse() != STRING)
-                        erro->showError(MSG_ERROR_STRING,
-                                        op->getRight()->getLine(),
-                                        op->getRight()->getColumn(),
-                                        op->getRight()->getToken());
-
-                    return STRING;
+                case LIST: semanticListReview(op->getLeft());
+                case FLOAT: return semanticFloatReview(op->getRight());
+                case INTEGER: return semanticIntegerReview(op->getRight());
+                case STRING: return semanticStringReview(op->getRight());
                 default:
                     erro->showError(MSG_ERROR_NON_TYPE,
                                     op->getLeft()->getLine(),
                                     op->getLeft()->getColumn(),
                                     op->getLeft()->getToken());
             }
-        case FLOAT:
-            if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != FLOAT)
-                erro->showError(MSG_ERROR_FLOAT,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            else if(op->getRight()->getClasse() != FLOAT)
-                erro->showError(MSG_ERROR_FLOAT,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            return FLOAT;
-        case INTEGER:
-            if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != INTEGER)
-                erro->showError(MSG_ERROR_INT,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            else if(op->getRight()->getClasse() != INTEGER)
-                erro->showError(MSG_ERROR_INT,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            return INTEGER;
-        case STRING:
-            if(op->getRight()->getClasse() == IDENTIFIER && op->getRight()->getType() != STRING)
-                erro->showError(MSG_ERROR_STRING,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            else if(op->getRight()->getClasse() != STRING)
-                erro->showError(MSG_ERROR_STRING,
-                                op->getRight()->getLine(),
-                                op->getRight()->getColumn(),
-                                op->getRight()->getToken());
-            return STRING;
+        case FLOAT: return semanticFloatReview(op->getRight());
+        case INTEGER: return semanticIntegerReview(op->getRight());
+        case STRING: return semanticStringReview(op->getRight());
+        default:
+            erro->showError(" Atributo sem classe ",
+                        op->getLeft()->getLine(),
+                        op->getLeft()->getColumn(),
+                        op->getLeft()->getToken());
+    }
+}
+
+void Semantic::semanticListReview(TokenType *token){
+    erro->showError(MSG_ERROR_LIST,
+                    token->getLine(),
+                    token->getColumn(),
+                    token->getToken());
+}
+
+int Semantic::semanticFloatReview(TokenType *token){
+    switch(token->getClasse()){
+        case FLOAT: return FLOAT;
+        case IDENTIFIER:
+            if(token->getType() == FLOAT) return FLOAT;
+        default:
+            erro->showError(MSG_ERROR_FLOAT,
+                        token->getLine(),
+                        token->getColumn(),
+                        token->getToken());
+    }
+}
+
+int Semantic::semanticIntegerReview(TokenType *token){
+    switch(token->getClasse()){
+        case INTEGER: return INTEGER;
+        case IDENTIFIER:
+            if(token->getType() == INTEGER) return INTEGER;
+        default:
+            erro->showError(MSG_ERROR_INT,
+                        token->getLine(),
+                        token->getColumn(),
+                        token->getToken());
+    }
+}
+
+int Semantic::semanticStringReview(TokenType *token){
+    switch(token->getClasse()){
+        case STRING: return STRING;
+        case IDENTIFIER:
+            if(token->getType() == STRING) return STRING;
+        default:
+            erro->showError(MSG_ERROR_STRING,
+                        token->getLine(),
+                        token->getColumn(),
+                        token->getToken());
     }
 }

@@ -16,18 +16,6 @@
 #define isUnderscore(ch)                    ((ch) == '_')
 #define isDot(ch)                           ((ch) == '.')
 
-//#define isOperator(ch)                      (strchr("+-*/", (ch)) != 0)
-//#define isSeparator(ch)                     (strchr(",(){};!-", (ch)) != 0)
-
-//#define isAssign(ch)                        (strchr("=",(ch)) != 0)
-//#define isLogicalOperator(ch)               (strchr("&|", (ch)) != 0)
-//#define isMajor(ch)                         ((ch) == '>')
-//#define isMinor(ch)                         ((ch) == '<')
-//#define isTil(ch)                           ((ch) == '~')
-//#define isP(ch)                             ((ch) == '(')
-//#define isString(ch)                        (strchr("'", (ch)) != 0)
-
-
 static const char charbits[256] = {
 0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,
 0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0040,0040,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0000,0002,0002,0002,0002,0002,0002,0002,
@@ -51,6 +39,7 @@ Lex::~Lex(){}
  ****************************************************************************************************/
 void Lex::recognizeIdentifier(TokenType* no) {
     no->setClasse(IDENTIFIER);
+    no->setType(NON_TYPE);
     no->setColumn(column);
     no->setLine(line);
     string s;
@@ -77,6 +66,7 @@ void Lex::recognizeIdentifier(TokenType* no) {
         if(s == "if") no->setType(IF);
         else no->setType(LOOP);
     }
+
     no->setToken(s);
 }
 
@@ -116,21 +106,16 @@ void Lex::recognizeIntegerOrFloat(TokenType* no) {
 void Lex::skipLayoutAndComment() {
     while (isLayout(*input)) {
         input++;
-        column++;
     }
     while (isCommentStarter(*input)) {
         input++;
-        column++;
         while (!isCommentStopper(*input)) {
             if (isEndOfInput(*input)) {
                 return;
             }
             input++;
-            column++;
         }
-        input++;
-        line++;
-        column = 0;
+        input++;        
         while (isLayout(*input)) {
             input++;
             column++;

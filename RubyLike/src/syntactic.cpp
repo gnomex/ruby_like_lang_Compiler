@@ -95,7 +95,7 @@ Attrib* Syntactic::syntacticIdentifier(TokenType *token){
  *  Retorna => tipo especializado
  ****************************************************************************************************/
 Attrib* Syntactic::syntacticAssign(TokenType *attr, TokenType *var){
-    TokenType *buffer, *token;
+    TokenType *buffer, *token, *temp;
     Attrib *attrib = new Attrib();
     attrib->setAttrib(attr);  // =
     attrib->setIdentificador(var);    //var
@@ -117,6 +117,9 @@ Attrib* Syntactic::syntacticAssign(TokenType *attr, TokenType *var){
                 case OPERATOR:
                 case LOGICAL:
                     attrib->setExpression(syntacticLogicalOrOperator(token, buffer)); //coloca operacao logica/aritmetica a direita
+
+                    //verifica se ja existe e seta tipo
+                    if((temp = prod->getTokenOfList(var->getToken())) != NULL) var->setType(temp->getType());
 
                     prod->insert(var); //sem tipo definido ainda (analise semantica)
                     break;
@@ -241,7 +244,7 @@ IFElse* Syntactic::syntacticIFstmt(TokenType *token){
  *  __IF    => referencia para a raiz
  ****************************************************************************************************/
 void Syntactic::expressionIFBlock(IFElse *__if){
-    TokenType *buffer, *token;
+    TokenType *buffer, *token, *temp;
     buffer = lex->getToken();
 
     if(buffer->getToken() == "("){
@@ -249,6 +252,10 @@ void Syntactic::expressionIFBlock(IFElse *__if){
 
         if(isAccept(buffer->getClasse())){
             token = lex->getToken();
+
+            //verifica se o token tem um tipo
+            if( (temp = prod->getTokenOfList(buffer->getToken())) != NULL) buffer->setType(temp->getType());
+
             prod->insert(buffer); //analize semantica
 
             if(isLogical(token->getClasse()) || isRelational(token->getClasse())){
@@ -260,6 +267,9 @@ void Syntactic::expressionIFBlock(IFElse *__if){
 
                 if(isAccept(buffer->getClasse())) {
                     op->setRight(buffer); //coloca var ou digito ou string a direita
+                    //verifica se existe na lista de producoes e pega o tipo
+                    if( (temp = prod->getTokenOfList(buffer->getToken())) != NULL) buffer->setType(temp->getType());
+
                     prod->insert(buffer); //analize semantica
                 }
                 else
@@ -286,7 +296,7 @@ void Syntactic::expressionIFBlock(IFElse *__if){
  *  WHO     => TRUE se for o bloco IF, FALSE se for o bloco ELSE
  ****************************************************************************************************/
 void Syntactic::blockIFELSEstmt(IFElse *__if, bool who){
-    TokenType *buffer, *token;
+    TokenType *buffer, *token, *temp;
     buffer = lex->getToken();
 
     if(buffer->getToken() == "{"){
@@ -295,8 +305,13 @@ void Syntactic::blockIFELSEstmt(IFElse *__if, bool who){
 
         switch(token->getClasse()){
             case IDENTIFIER:
+                //verifica se existe nas producoes e pega o tipo
+                if( (temp = prod->getTokenOfList(token->getToken())) != NULL) token->setType(temp->getType());
+
                 prod->insert(token); //analize semantica
+
                 buffer = lex->getToken(); //pega o =
+
                 if(buffer->getClasse() != ASSIGN)
                     erro->showError(" = esperado mas: ", buffer->getLine(), buffer->getColumn(), buffer->getToken());
 
@@ -345,12 +360,15 @@ Each* Syntactic::syntacticEach(TokenType *token){
  *  EACH    => referencia para a raiz
  ****************************************************************************************************/
 void Syntactic::eachExpression(Each *each){
-    TokenType *buffer, *token;
+    TokenType *buffer, *token, *temp;
     buffer = lex->getToken();
 
     if(buffer->getToken() == "("){
         buffer = lex->getToken();
         if(buffer->getClasse() == IDENTIFIER){
+            //verifica se existe nas producoes e seta o tipo
+            if( (temp = prod->getTokenOfList(buffer->getToken())) != NULL) buffer->setType(temp->getType());
+
             prod->insert(buffer); //analize semantica
             token = lex->getToken(); // ->
 
@@ -361,6 +379,9 @@ void Syntactic::eachExpression(Each *each){
 
                 buffer = lex->getToken();
                 if(buffer->getClasse() == IDENTIFIER){
+                    //verifica tipo e seta
+                    if( (temp = prod->getTokenOfList(buffer->getToken())) != NULL) buffer->setType(temp->getType());
+
                     prod->insert(buffer); //analize semantica
                     op->setRight(buffer);
                     each->setExpression(op);

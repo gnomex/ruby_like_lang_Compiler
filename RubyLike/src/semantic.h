@@ -13,14 +13,20 @@
 class Semantic
 {
     private:
-        AST *ast;
-        Error *erro;
-        void review(TokenType *token);
-        int reviewOperation(Operator *op);
+        AST     *ast;
+        Error   *erro;
+        void    review(TokenType *token);
+        int     reviewOperation(Operator *op);
+
+        //verificacao de erros
+        void    semanticListReview(TokenType *token);
+        int     semanticFloatReview(TokenType *token);
+        int     semanticIntegerReview(TokenType *token);
+        int     semanticStringReview(TokenType *token);
     public:
         Semantic();
         ~Semantic();
-        void parsing();
+        void    parsing();
 };
 
 #endif // SEMANTIC_H
