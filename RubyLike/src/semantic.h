@@ -16,7 +16,7 @@ class Semantic
         AST     *ast;
         Error   *erro;
         void    review(TokenType *token);
-        int     reviewOperation(Operator *op);
+        int     reviewOperation(Operator *op, bool isEach);
 
         //verificacao de erros
         void    semanticListReview(TokenType *token);

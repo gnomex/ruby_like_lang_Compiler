@@ -38,7 +38,7 @@ void Semantic::review(TokenType *token){
             Attrib *nott = (Attrib*)token;
             if(nott->getExpression()->getClasse() == OPERATOR){
                 Operator *optt = (Operator*)nott->getExpression();
-                nott->getIdentificador()->setType(reviewOperation(optt)); //seta tipo de acordo com reviewOperation
+                nott->getIdentificador()->setType(reviewOperation(optt, false)); //seta tipo de acordo com reviewOperation
 
                 return;
             }
@@ -53,7 +53,7 @@ void Semantic::review(TokenType *token){
             if(token->getToken() == "if"){
                 IFElse *noif = (IFElse *)token;
                 Operator *opif = (Operator *)noif->getExpression();
-                reviewOperation(opif); //verifica se os lados esquerdo e direito sao do mesmo tipo
+                reviewOperation(opif, false); //verifica se os lados esquerdo e direito sao do mesmo tipo
                 review(noif->getBlockIF()); //recursivamente verifica o bloco do IF
                 review(noif->getElseBlock()); //recursivamente verifica o bloco do else
                 return; //sai
@@ -62,7 +62,7 @@ void Semantic::review(TokenType *token){
             if(token->getToken() == "each"){
                 Each *noch = (Each *)token;
                 Operator *opch = (Operator *)noch->getExpression();
-                reviewOperation(opch); //verifica se os lados esquerdo e direito sao do mesmo tipo
+                reviewOperation(opch, true); //verifica se os lados esquerdo e direito sao do mesmo tipo
                 review(noch->getBlock()); //recursivamente verifica o bloco
                 return; //sai
             }
@@ -80,12 +80,12 @@ void Semantic::review(TokenType *token){
  *  Somente verifica se os lados esquerdo e direito sao do mesmo tipo
  *
  ****************************************************************************************************/
-int Semantic::reviewOperation(Operator *op){
+int Semantic::reviewOperation(Operator *op,bool isEach){
 
     switch(op->getLeft()->getClasse()){
         case IDENTIFIER: //se for variavel
             switch(op->getLeft()->getType()){ //se a esquerda for
-                case LIST: semanticListReview(op->getLeft());
+                case LIST: if(!isEach) semanticListReview(op->getLeft());
                 case FLOAT: return semanticFloatReview(op->getRight());
                 case INTEGER: return semanticIntegerReview(op->getRight());
                 case STRING: return semanticStringReview(op->getRight());
