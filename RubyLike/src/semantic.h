@@ -16,7 +16,7 @@ class Semantic
         AST *ast;
         Error *erro;
         void review(TokenType *token);
-        void reviewOperation(Operator *op);
+        int reviewOperation(Operator *op);
     public:
         Semantic();
         ~Semantic();

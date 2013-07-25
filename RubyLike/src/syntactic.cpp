@@ -117,6 +117,7 @@ Attrib* Syntactic::syntacticAssign(TokenType *attr, TokenType *var){
                 case OPERATOR:
                 case LOGICAL:
                     attrib->setExpression(syntacticLogicalOrOperator(token, buffer)); //coloca operacao logica/aritmetica a direita
+
                     prod->insert(var); //sem tipo definido ainda (analise semantica)
                     break;
                 case END_CMD:
@@ -178,10 +179,13 @@ TList* Syntactic::syntacticList(TokenType *til){
  *  Retorna => tipo especializado
  ****************************************************************************************************/
 Operator* Syntactic::syntacticLogicalOrOperator(TokenType *opr, TokenType *var){
-    TokenType *buffer;
+    TokenType *buffer, *temp;
     Operator *op = new Operator();
     op->setOperator(opr); //operador
     op->setLeft(var); //coloca var ou constante a esquerda
+
+    //verifica se o token existe e coloca o tipo no novo token
+    if( (temp = prod->getTokenOfList(var->getToken())) != NULL ) var->setType(temp->getType());
 
     buffer = lex->getToken(); //pega var ou constante
 
@@ -191,6 +195,9 @@ Operator* Syntactic::syntacticLogicalOrOperator(TokenType *opr, TokenType *var){
         case STRING:
         case IDENTIFIER:
             op->setRight(buffer); //coloca a direita
+
+            if( (temp = prod->getTokenOfList(buffer->getToken())) != NULL) buffer->setType(temp->getType());
+
             prod->insert(buffer); //pode ser contante (int/float/string) ou sem tipo identificador (analise semantica)
 
             buffer = lex->getToken();

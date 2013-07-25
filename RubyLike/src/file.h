@@ -16,10 +16,10 @@ class File
         int type;       //tipo de abertura
 
     public:
-        File(const string& fileName,int type);
+        File(const string& fileIN,const string& fileOut);
         File(){}
         ~File();
-        void open(const string& fileName,int type);
+        void open(const string& fileIN, const string& fileOut);
         bool isOpen();
         void close();
         char readChar();

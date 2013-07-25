@@ -28,7 +28,8 @@ SOURCES += main.cpp \
     src/each.cpp \
     src/tlist.cpp \
     src/syntactic.cpp \
-    src/error.cpp
+    src/error.cpp \
+    src/semantic.cpp
 
 HEADERS += \
     src/lex.h \
@@ -44,4 +45,5 @@ HEADERS += \
     src/each.h \
     src/tlist.h \
     src/syntactic.h \
-    src/error.h
+    src/error.h \
+    src/semantic.h

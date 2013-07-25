@@ -4,16 +4,11 @@
  *  Type = 1 => leitura
  *  Type = 0 => escrita
  */
-File::File(const string& fileName, int type)
+File::File(const string& fileIN,const string& fileOut)
 {
-    if(type){
-        in.open(fileName.c_str(), ios_base::in);
-        this->type = type;
-    }
-    else{
-        out.open(fileName.c_str(), ios_base::out | ios_base::app);
-        this->type = type;
-    }
+    in.open(fileIN.c_str(), ios_base::in);
+    out.open(fileOut.c_str(), ios_base::out | ios_base::app);
+
 }
 
 File::~File(){
@@ -25,28 +20,20 @@ File::~File(){
  *  Type = 1 => leitura
  *  Type = 0 => escrita
  */
-void File::open(const string& fileName, int type){
-    if(type){
-        in.open(fileName.c_str(), ios_base::in);
-        this->type = type;
-    }
-    else{
-        out.open(fileName.c_str(), ios_base::out | ios_base::app);
-        this->type = type;
-    }
+void File::open(const string& fileIN,const string& fileOut){
+
+    in.open(fileIN.c_str(), ios_base::in);
+    out.open(fileOut.c_str(), ios_base::out | ios_base::app);
+
 }
 /*
  *  Verifica se o arquivo esta aberto
  */
 bool File::isOpen(){
-    if(type){ //se leitura
-        if(in) return true;
-        else return false;
-    }
-    else{//escrita
-        if(out) return true;
-        else return false;
-    }
+    if(in) return true;
+    if(out) return true;
+
+    return false;
 }
 /*
  *  Fecha o arquivo
@@ -78,19 +65,6 @@ char* File::readString(){
 
     return buffer;
 }
-
-/*string* File::readString(){
-    char *buffer = NULL;
-    string *res;
-
-    if(in){
-        buffer = new char[255];
-        in.read(buffer,254);
-        res = new string(buffer);
-    }
-
-    return res;
-}*/
 /*
  *  Escreve dados no arquivo de saida
  */
