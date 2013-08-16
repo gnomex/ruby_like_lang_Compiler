@@ -1,0 +1,43 @@
+identifier ::= <letter> (<letter> | <digit>)* (_ (<letter> | <digit>)+)*
+letter ::= [A-Za-z]
+digit ::= [0-9]
+integer ::= <digit>+
+float ::= <integer>('.'<integer>)?
+operator ::= + | - | * | /
+separator ::= ( | ) | { | } | [ | ] | , | !
+_______________________________________________________________________________
+
+<PROGRAM> ::= <STATEMENTLIST>
+<STATEMENTLIST> ::= <INSTRUCTION>(<STATEMENTLIST>)* | E
+<INSTRUCTION> ::= <ASSIGNMENT> | <CONDITION> | <LOOP>
+
+<STRING> ::= '''<IDENTIFIER>*''' | '"'<IDENTIFIER>*'"'
+<COMMENT> ::= #<IDENTIFIER>*
+
+<IDCHAR> ::= <LETTER>  | '_'
+
+<ACCESSARRAY_POSITION> ::= <IDENTIFIER>'['<INTEGER>']'
+<FACTOR> ::= <INTEGER> | <STRING> | <IDENTIFIER>
+
+<OP_LOOP> ::= '.each'
+<OP_LIST> ::= '~('
+<OP_COMA> ::= ','
+
+<COMPARISON> ::= '<=' | '>=' | '==' | '>' | '<' | '!='
+
+<LIST> ::= <OP_LIST> <FACTOR> (, (<FACTOR>))* ')'	=> Exemplo: array = ~( “Alguma coisa”, 1 , ‘Alguma outra coisa’ )
+
+<LOGICAL_OPERATOR> ::= '&' | '|'
+<LOGICAL_OPERATION> ::= '('<FACTOR> <COMPARISON> <FACTOR>')' | <FACTOR> <COMPARISON> <FACTOR> | <LOGICAL_EXPRESSION>
+
+<LOGICAL_EXPRESSION> ::= '('<LOGICAL_OPERATION> <LOGICAL_OPERATOR> <LOGICAL_OPERATION>')' | <LOGICAL_OPERATION> <LOGICAL_OPERATOR> <LOGICAL_OPERATION>
+
+<ASSIGNMENT> ::= <ASSIGN_LEFT> '=' <ASSIGN_RIGHT> '!''
+<ASSIGN_LEFT> ::= <IDENTIFIER> | <ACCESS_POSITION>
+<ASSIGN_RIGHT> ::= <LIST> | <LOGICAL_EXPRESSION>
+
+<CONDITION> ::= 'if' '('<LOGICAL_EXPRESSION>')' '{'<INSTRUCTION>'}' 'else' '{'<INSTRUCTION>'}' | 'if' ('<LOGICAL_EXPRESSION>')' '{'<INSTRUCTION>'}'
+
+<LOOP> ::=  '('<LOOP_EXPR>')' <OP_LOOP> '{'<INSTRUCTION>'}'
+<LOOP_EXPR> ::=  <ITERATOR> | <LOGICAL_EXPRESSION> | <INTEGER>
+<ITERATOR> ::= <IDENTIFIER> '->' <IDENTIFIER>
