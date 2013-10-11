@@ -41,14 +41,14 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   static final public int one_line() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case MINUS:
-    case CONSTANT:
-    case 12:
+    case INTEGER:
+    case 31:
       sum();
-      jj_consume_token(11);
+      jj_consume_token(30);
     {if (true) return 0;}
       break;
-    case 11:
-      jj_consume_token(11);
+    case 30:
+      jj_consume_token(30);
     {if (true) return 1;}
       break;
     default:
@@ -123,8 +123,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
       jj_consume_token(MINUS);
       element();
       break;
-    case CONSTANT:
-    case 12:
+    case INTEGER:
+    case 31:
       element();
       break;
     default:
@@ -136,13 +136,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   static final public void element() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case CONSTANT:
-      jj_consume_token(CONSTANT);
+    case INTEGER:
+      jj_consume_token(INTEGER);
       break;
-    case 12:
-      jj_consume_token(12);
+    case 31:
+      jj_consume_token(31);
       sum();
-      jj_consume_token(13);
+      jj_consume_token(32);
       break;
     default:
       jj_la1[6] = jj_gen;
@@ -163,11 +163,16 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   static private int jj_gen;
   static final private int[] jj_la1 = new int[7];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1a40,0x60,0x60,0x180,0x180,0x1240,0x1200,};
+      jj_la1_0 = new int[] {0xc0040040,0x60,0x60,0x180,0x180,0x80040040,0x80040000,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -305,7 +310,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[14];
+    boolean[] la1tokens = new boolean[33];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -316,10 +321,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 33; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
