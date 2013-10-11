@@ -1,8 +1,108 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
- */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(RubyLikeGrammar)package br.unioeste.compiler.rubylike;
+ */options{  JDK_VERSION = "1.5";  static = false;
+  LOOKAHEAD = 2;
+  DEBUG_PARSER = false;}PARSER_BEGIN(RubyLikeGrammar)package br.unioeste.compiler.rubylike;
 
-public class RubyLikeGrammar{  public static void main(String args []) throws ParseException  {    RubyLikeGrammar parser = new RubyLikeGrammar(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (RubyLikeGrammar.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        RubyLikeGrammar.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(RubyLikeGrammar)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >
+import java.io.*;
+import java.util.*;
+import br.unioeste.compiler.recovery.*;
+
+public class RubyLikeGrammar{
+    int contParseError; // Contador de erros sintáticos
+    boolean debug_recovery; // Controla a verbose de recuperação de erros
+
+    Hashtable tbl = new Hashtable ();
+      public static void main(String args []) throws ParseException  {
+    boolean debug_as = false;
+    boolean debug_recovery = false;
+    RubyLikeGrammar parser = new RubyLikeGrammar(System.in);
+
+    parser.debug_recovery = debug_recovery;
+    
+    if (!debug_as) parser.disable_tracing();
+        int b=1;
+    while (b==1) {
+      System.out.println("Lendo da entrada padrão...");
+      System.out.print("Expressão \"1+(2+3)*4;\" ou atribuição :");
+      try {
+        b = parser.one_line();
+        switch (b) {
+          case 0 :  System.out.println("Goodbye.");
+                    break;
+          case 1 :  System.out.println("OK.");
+                    break;
+          default : break;
+        }
+      }
+      catch (ParseException e) {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        parser.ReInit(System.in);
+      }
+      catch (Exception e) {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        parser.ReInit(System.in);
+      }
+      catch (Error e) {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }  }
+
+  void mostrarResult ( double a )
+  {
+ 	//this.erros.append ( Double.toString ( a ) );
+  } 
+
+  // Relaciona o indice de um token com seu nome
+  static public String im ( int x ) {
+    int k;
+    String s;
+    s = tokenImage[x];
+    k = s.lastIndexOf ( "\"");
+    try {
+      s = s.substring ( 1, k );
+    } catch ( StringIndexOutOfBoundsException e ) { }
+    return s;
+  }
+
+  boolean eof; // Variável que indica se EOF foi alcançado
+  // O método abaixo consome os tokens até alcançar um que pertença
+  // ao conjunto de resincronização
+  void consumeUntil ( RecoverySet g,
+                      ParseException e,
+                      String met ) throws ParseEOFException, ParseException  {
+     Token tok;
+     eof=false; // FIXME
+     if (debug_recovery) { // Informação sobre a recuperação
+       //erros.append("");
+       //erros.append( "*** " + met + " *** ");
+       //erros.append( " Syncronizing Set: "+ g );
+     }
+     if (g==null) throw e; // se o conjunto de recuperação é null, propaga a exceção
+
+     tok = getToken ( 1 ); // pega o token atual
+     while (!eof) {
+       if ( g.contains ( tok.kind ) ) {
+         if ( debug_recovery )
+           //erros.append( " Found syncronizing token: " + im (tok.kind));
+         break;
+       }
+       if (debug_recovery)
+         //erros.append( " Ignorando token "+ im ( tok.kind));
+       getNextToken();
+       tok = getToken(1);
+       if (tok.kind==EOF && !g.contains(EOF) )
+         eof = true;
+     }
+     System.out.println ( e.getMessage());
+     contParseError++;
+     if ( eof ) throw new ParseException ( "EOF found prematurely.");
+   }
+   }PARSER_END(RubyLikeGrammar)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >
 | < MINOR : "<" >
 | < MAJOR : ">" >
 | < ATTRIB : "=" >
@@ -21,4 +121,107 @@ public class RubyLikeGrammar{  public static void main(String args []) throws 
 | < END_BLOCK_CMD: ["}"] >
 | < END_CMD : ["!"] >
 | < FLOAT : < DIGIT >("."< DIGIT >)* >
-| < STRING : ["\""] (< LETTER > | < SPACE > | < DIGIT >)+ ["\""] >}int one_line() :{}{  sum() ";"  {    return 0;  }| ";"  {    return 1;  }}void sum() :{}{  term()  (    (      < PLUS >    | < MINUS >    )    term()  )*}void term() :{}{  unary()  (    (      < MULTIPLY >    | < DIVIDE >    )    unary()  )*}void unary() :{}{  < MINUS > element()| element()}void element() :{}{  < INTEGER >| "(" sum() ")"}
+| < STRING : ["\""] (< LETTER > | < SPACE > | < DIGIT >)+ ["\""] >
+| < FIM : ";" >}int one_line() throws Exception :
+{
+  RecoverySet g = new RecoverySet ( EOF );
+}
+{
+  try  {    
+     ( calc(g) )+  { return 1; }          
+   |  < FIM >      { return 0; } 
+     
+  } catch ( ParseException e ) {
+	consumeUntil ( g, e, "one_line" );
+  }  
+}
+
+void calc (RecoverySet f) throws Exception :
+{ double a = 0;
+  RecoverySet g = First.calc.union ( f );
+}
+{
+  try  {    
+     vars()    < FIM > 
+   | a = sum() < FIM > { mostrarResult( a ); }
+ 
+//System.out.println ( a ); }
+  } catch ( ParseException e ) {
+	consumeUntil ( g, e, "calc" );
+	getNextToken();
+  }  
+}
+
+// Declarar ou alterar o valor de variáveis
+void vars() throws Exception : { Token var; double a=0; }
+{
+  var = < VAR > < ATTRIB > a=sum()
+  {
+    tbl.put ( var.image, new Float(a) );
+    System.out.println ( "Variável ["+var.image+"] criada/modificada!" );
+    return;
+  }
+}
+
+float sum()  throws Exception : { float a=0, b=0; Token tk; }
+{
+  a = term()
+  (
+    (
+      tk = < PLUS >
+    | tk = < MINUS >
+    )
+    b = term()
+    {
+      if (tk.image=="+")
+        a+=b;
+      else
+        a-=b;
+    }        
+  )*
+  { return a; }
+}
+
+float term()  throws Exception : { float a=0, b=0; Token tk; }
+{
+  a = unary()
+  (
+    (
+      tk = < MULTIPLY >
+    | tk = < DIVIDE >
+    )
+    b = unary()
+    {
+       if (tk.image=="*")
+        a*=b;
+      else
+        a/=b;
+    }
+  )*
+  { return a; }   
+}
+
+float unary()  throws Exception :
+{float a=0; }
+{
+  < MINUS > a=element() { return -a; }
+| a=element() { return a; }
+}
+
+float element() throws Exception : 
+{
+  Token tk; float a=0;
+}
+{
+     tk = < INTEGER > { return Integer.parseInt ( tk.image ); }
+   | tk = < FLOAT >  { return Float.parseFloat ( tk.image ); }
+   | tk = < VAR >
+   {
+      if (tbl.containsKey(tk.image))
+        return ((Float)tbl.get(tk.image)).floatValue();
+      throw new ParseException (
+        "Variável ["+ tk.image + "] não localizada!"
+      + " Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn );
+   }
+   | "(" a = sum() ")" { return a; }
+}
