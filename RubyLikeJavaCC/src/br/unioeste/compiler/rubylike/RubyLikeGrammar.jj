@@ -102,7 +102,27 @@ public class RubyLikeGrammar{
      contParseError++;
      if ( eof ) throw new ParseException ( "EOF found prematurely.");
    }
-   }PARSER_END(RubyLikeGrammar)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >
+   }PARSER_END(RubyLikeGrammar)SKIP :{  " "| "\r"| "\t"| "\n"
+| "\f"
+| "#" : singlelinecomment
+| "/*" : multilinecomment}
+< singlelinecomment > SKIP :
+{
+  < ["\n","\r"] > : DEFAULT
+| < ~[] >}
+
+< multilinecomment > SKIP:
+{
+  "*/" : DEFAULT
+| < ~[] >}
+
+TOKEN : /* palavras reservadas */
+{
+  < IF : "if" >
+| < EACH : "each" >
+| < ELSE : "else" >
+| < PRINT : "print" >}
+TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >
 | < MINOR : "<" >
 | < MAJOR : ">" >
 | < ATTRIB : "=" >
@@ -111,25 +131,93 @@ public class RubyLikeGrammar{
 | < EQUALS : "==" >
 | < AND : "&&" >
 | < OR : "||" >
-| < LIST : ["~"] >}TOKEN :{  < INTEGER : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
+| < LIST : "~" >}
+TOKEN : /* simbolos especiais */
+{
+  < LPAREN : "(" >
+| < RPAREN : ")" >
+| < LBRACE : "{" >
+| < RBRACE : "}" >
+| < LBRACKET : "[" >
+| < RBRACKET : "]" >
+| < SEMICOLON : ";" >
+| < COMMA : "," >
+| < DOT : "." >
+| < END_CMD : "!" > }
+TOKEN :{
+  < INT_CONSTANT : (
+    (["0"-"9"] (["0"-"9"])*) |
+    (["0"-"7"] (["0"-"7"])* ["o","O"]) |
+    (["0"-"9"] (["0"-"7", "A"-"F", "a"-"f"])* ["h","H"]) |
+    (["0"-"1"] (["0"-"1"])* ["b","B"]) ) >
+| < STRING : "\""(~["\"", "\n", "\r"])* "\"" >| < #DIGIT : [ "0"-"9" ] >
 | < #LETTER : ["A"-"Z"] | ["a"-"z"] >
-| < #SPACE : [" "] >
 | < VAR : < LETTER > ( < DIGIT > | < LETTER > ) * >
-| < START_BLOCK_EXP : ["("] >
-| < END_BLOC_EXP : [")"] >
-| < START_BLOCK_CMD : ["{"] >
-| < END_BLOCK_CMD: ["}"] >
-| < END_CMD : ["!"] >
-| < FLOAT : < DIGIT >("."< DIGIT >)* >
-| < STRING : ["\""] (< LETTER > | < SPACE > | < DIGIT >)+ ["\""] >
-| < FIM : ";" >}int one_line() throws Exception :
+| < FLOAT : < DIGIT >(< DOT >< DIGIT >)* >}
+void program() :{}
+{
+	try  {
+	  	  vars()    < END_CMD > 
+   		| list()	< END_CMD >
+   		| IfElse()
+   		| each()
+  	} catch ( ParseException e ) {
+		consumeUntil ( g, e, "calc" );
+		getNextToken();
+  	}}
+
+void list() :{}
+{
+  < LIST >
+  	< LBRACE >
+  		(vars() < SEMICOLON >)+ |
+  		(< INT_CONSTANT > < SEMICOLON >)+ |
+  		(< STRING > < SEMICOLON >)+
+	< RBRACE >}
+
+void IfElse():{}
+{
+  < IF > expression() ifBlock()
+  < ELSE > elseBlock()
+  	}
+
+void expression():
+{}
+{
+	< LBRACE >
+  		(< INT_CONSTANT > | < STRING > | vars() (< AND > | < OR >)+ < INT_CONSTANT > | < STRING > | vars())+
+  	< RBRACE >}
+
+void ifBlock():{}{
+	< LBRACKET >
+  		(vars())+ < END_CMD >
+  	< RBRACKET >}
+
+void elseBlock():
+{}
+{
+	< LBRACKET >
+  		(vars())+ < END_CMD >
+  	< RBRACKET >}
+
+void each():{}
+{
+	< EACH > expression() eachBlock()}
+
+void eachBlock():{}
+{
+	< LBRACKET >
+		(vars())* |
+		(IfElse())*
+	< RBRACKET >}
+int one_line() throws Exception :
 {
   RecoverySet g = new RecoverySet ( EOF );
 }
 {
   try  {    
      ( calc(g) )+  { return 1; }          
-   |  < FIM >      { return 0; } 
+   |  < END_CMD >      { return 0; } 
      
   } catch ( ParseException e ) {
 	consumeUntil ( g, e, "one_line" );
@@ -142,8 +230,8 @@ void calc (RecoverySet f) throws Exception :
 }
 {
   try  {    
-     vars()    < FIM > 
-   | a = sum() < FIM > { mostrarResult( a ); }
+     vars()    < END_CMD > 
+   | a = sum() < END_CMD > { mostrarResult( a ); }
  
 //System.out.println ( a ); }
   } catch ( ParseException e ) {
@@ -213,7 +301,7 @@ float element() throws Exception :
   Token tk; float a=0;
 }
 {
-     tk = < INTEGER > { return Integer.parseInt ( tk.image ); }
+     tk = < INT_CONSTANT > { return Integer.parseInt ( tk.image ); }
    | tk = < FLOAT >  { return Float.parseFloat ( tk.image ); }
    | tk = < VAR >
    {
