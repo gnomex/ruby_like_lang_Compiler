@@ -26,7 +26,7 @@ public class RubyLikeGrammar{
       System.out.println("Lendo da entrada padrão...");
       System.out.print("Expressão \"1+(2+3)*4;\" ou atribuição :");
       try {
-        b = parser.one_line();
+        b = parser.program();
         switch (b) {
           case 0 :  System.out.println("Goodbye.");
                     break;
@@ -154,89 +154,89 @@ TOKEN : /* simbolos especiais */
 | < #LETTER : ["A"-"Z"] | ["a"-"z"] >
 | < VAR : < LETTER > ( < DIGIT > | < LETTER > ) * >
 | < FLOAT : < DIGIT >(< DOT >< DIGIT >)* >}
-void program() :{}
+int program() throws Exception:{
+  	RecoverySet g = new RecoverySet ( EOF );}
 {
 	try  {
-	  	  vars()    < END_CMD > 
-   		| list()	< END_CMD >
-   		| IfElse()
-   		| each()
+	  	  calc(g){return 1;} 
+	 	| vars()    	< END_CMD > 
+   		| list(g)		< END_CMD >
+   		| IfElse(g)
+   		| each(g)
+   		| < EOF >{return 0;}
   	} catch ( ParseException e ) {
 		consumeUntil ( g, e, "calc" );
 		getNextToken();
   	}}
 
-void list() :{}
+void list(RecoverySet g) throws Exception:{}
 {
   < LIST >
-  	< LBRACE >
-  		(vars() < SEMICOLON >)+ |
-  		(< INT_CONSTANT > < SEMICOLON >)+ |
-  		(< STRING > < SEMICOLON >)+
-	< RBRACE >}
+  	< LPAREN >
+  		try  		{
+  		  	(vars() < SEMICOLON >)+ |
+  			(< INT_CONSTANT > < SEMICOLON >)+ |
+  			(< STRING > < SEMICOLON >)+  		} catch(ParseException e)  		{
+  		  consumeUntil(g, e, "list");  		}
+  		
+	< RPAREN >}
 
-void IfElse():{}
+void IfElse(RecoverySet g) throws Exception:{}
 {
-  < IF > expression() ifBlock()
-  < ELSE > elseBlock()
+  < IF > expression(g) ifBlock(g)
+  < ELSE > elseBlock(g)
   	}
 
-void expression():
+void expression(RecoverySet g) throws Exception:
+{}
+{
+	< LPAREN >
+		try		{
+		  	(< INT_CONSTANT > | < STRING > | vars() (< AND > | < OR >)+ < INT_CONSTANT > | < STRING > | vars())+		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "expression");		}
+  	< RPAREN >}
+
+void ifBlock(RecoverySet g) throws Exception:{}{
+	< LBRACE >
+		try		{
+		 	(vars())+ < END_CMD >		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "ifBlock");		}
+  	< RBRACE >}
+
+void elseBlock(RecoverySet g) throws Exception:
 {}
 {
 	< LBRACE >
-  		(< INT_CONSTANT > | < STRING > | vars() (< AND > | < OR >)+ < INT_CONSTANT > | < STRING > | vars())+
+		try		{
+		  	(vars())+ < END_CMD >		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "elseBlock");		}
   	< RBRACE >}
 
-void ifBlock():{}{
-	< LBRACKET >
-  		(vars())+ < END_CMD >
-  	< RBRACKET >}
+void each(RecoverySet g) throws Exception:{}
+{
+	< EACH > expression(g) eachBlock(g)}
 
-void elseBlock():
-{}
+void eachBlock(RecoverySet g) throws Exception:{}
 {
-	< LBRACKET >
-  		(vars())+ < END_CMD >
-  	< RBRACKET >}
-
-void each():{}
-{
-	< EACH > expression() eachBlock()}
-
-void eachBlock():{}
-{
-	< LBRACKET >
-		(vars())* |
-		(IfElse())*
-	< RBRACKET >}
-int one_line() throws Exception :
-{
-  RecoverySet g = new RecoverySet ( EOF );
-}
-{
-  try  {    
-     ( calc(g) )+  { return 1; }          
-   |  < END_CMD >      { return 0; } 
-     
-  } catch ( ParseException e ) {
-	consumeUntil ( g, e, "one_line" );
-  }  
-}
+	< LBRACE >
+		try		{
+		 	(vars())* |
+			(IfElse())*		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "eachBlock");		}
+		
+	< RBRACE >}
 
 void calc (RecoverySet f) throws Exception :
 { double a = 0;
   RecoverySet g = First.calc.union ( f );
 }
 {
-  try  {    
-     vars()    < END_CMD > 
-   | a = sum() < END_CMD > { mostrarResult( a ); }
- 
-//System.out.println ( a ); }
+  try  {
+    	vars()    	< END_CMD > 
+   		| a = sum() < END_CMD > { mostrarResult( a ); }
   } catch ( ParseException e ) {
-	consumeUntil ( g, e, "calc" );
-	getNextToken();
+		consumeUntil ( g, e, "calc" );
+		getNextToken();
   }  
 }
 
