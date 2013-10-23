@@ -14,8 +14,8 @@ public class RubyLikeGrammar{
 
     Hashtable tbl = new Hashtable ();
       public static void main(String args []) throws ParseException  {
-    boolean debug_as = false;
-    boolean debug_recovery = false;
+    boolean debug_as = true;
+    boolean debug_recovery = true;
     RubyLikeGrammar parser = new RubyLikeGrammar(System.in);
 
     parser.debug_recovery = debug_recovery;
@@ -131,7 +131,8 @@ TOKEN : /* palavras reservadas */
 | < EQUALS : "==" >
 | < AND : "&&" >
 | < OR : "||" >
-| < LIST : "~" >}
+| < LIST : "~" >
+| < SETA : "->" >}
 TOKEN : /* simbolos especiais */
 {
   < LPAREN : "(" >
@@ -158,73 +159,79 @@ int program() throws Exception:{
   	RecoverySet g = new RecoverySet ( EOF );}
 {
 	try  {
-	  	  calc(g){return 1;} 
-	 	| vars()    	< END_CMD > 
-   		| list(g)		< END_CMD >
-   		| IfElse(g)
-   		| each(g)
+	 	calc(g){return 1;}
    		| < EOF >{return 0;}
   	} catch ( ParseException e ) {
 		consumeUntil ( g, e, "calc" );
 		getNextToken();
   	}}
 
-void list(RecoverySet g) throws Exception:{}
+Object list() throws Exception:{
+  	Object t; List<Object> lista = new ArrayList<Object>();}
 {
   < LIST >
   	< LPAREN >
-  		try  		{
-  		  	(vars() < SEMICOLON >)+ |
-  			(< INT_CONSTANT > < SEMICOLON >)+ |
-  			(< STRING > < SEMICOLON >)+  		} catch(ParseException e)  		{
-  		  consumeUntil(g, e, "list");  		}
-  		
-	< RPAREN >}
+  		(t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT >)+
+  		("," t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT >)*
+  	< RPAREN >
+  	{
+   		lista.add(t);  	}
+  	
+  {return lista;}}
 
-void IfElse(RecoverySet g) throws Exception:{}
+void IfElse(RecoverySet g) throws Exception:{
+ 	boolean cond = false;}
 {
-  < IF > expression(g) ifBlock(g)
-  < ELSE > elseBlock(g)
-  	}
+  < IF > "(" expressionLogical(g) ")" "{" ifBlock(g) "}" < ELSE > "{" elseBlock(g) "}" |  < IF > "(" expressionLogical(g) ")" "{" ifBlock(g) "}"    }
 
-void expression(RecoverySet g) throws Exception:
+void expressionLogical(RecoverySet g) throws Exception:
 {}
 {
-	< LPAREN >
-		try		{
-		  	(< INT_CONSTANT > | < STRING > | vars() (< AND > | < OR >)+ < INT_CONSTANT > | < STRING > | vars())+		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "expression");		}
-  	< RPAREN >}
+	(< VAR > opExpression() < VAR >) |	(< INT_CONSTANT > opExpression() < INT_CONSTANT >) |
+	(< VAR > opExpression() < INT_CONSTANT >) |	(< INT_CONSTANT > opExpression() < VAR >)
+	}
 
+void opExpression():{}
+{
+ 	< AND >
+ 	| < OR >
+ 	| < MINOR >
+ 	| < MAJOR >
+ 	| < EQUALS >
+ 	| < MINOR_EQUAL >
+ 	| < MAJOR_EQUAL >}
 void ifBlock(RecoverySet g) throws Exception:{}{
-	< LBRACE >
 		try		{
-		 	(vars())+ < END_CMD >		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "ifBlock");		}
-  	< RBRACE >}
+		 	(vars(null))* < END_CMD >
+			| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "ifBlock");		}}
 
 void elseBlock(RecoverySet g) throws Exception:
 {}
 {
-	< LBRACE >
 		try		{
-		  	(vars())+ < END_CMD >		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "elseBlock");		}
-  	< RBRACE >}
+		  	(vars(null))* < END_CMD >
+		 	| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "elseBlock");		}}
 
 void each(RecoverySet g) throws Exception:{}
 {
-	< EACH > expression(g) eachBlock(g)}
+	< EACH > "(" eachExp(g) ")" "{" eachBlock(g) "}"}
+
+void eachExp(RecoverySet g) throws Exception:
+{}
+{
+  try  {
+	< VAR > < SETA > < VAR >
+  }catch(ParseException e)  {
+    consumeUntil(g, e, "eachExp");  }}
 
 void eachBlock(RecoverySet g) throws Exception:{}
 {
-	< LBRACE >
 		try		{
-		 	(vars())* |
-			(IfElse())*		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "eachBlock");		}
-		
-	< RBRACE >}
+		 	(vars(null))* < END_CMD >
+		 	| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
+		  	consumeUntil(g, e, "eachBlock");		}}
 
 void calc (RecoverySet f) throws Exception :
 { double a = 0;
@@ -232,8 +239,10 @@ void calc (RecoverySet f) throws Exception :
 }
 {
   try  {
-    	vars()    	< END_CMD > 
-   		| a = sum() < END_CMD > { mostrarResult( a ); }
+		each(g) 		< END_CMD >
+		| IfElse(g)		< END_CMD >
+    	| vars(null)    	< END_CMD >
+    	
   } catch ( ParseException e ) {
 		consumeUntil ( g, e, "calc" );
 		getNextToken();
@@ -241,75 +250,96 @@ void calc (RecoverySet f) throws Exception :
 }
 
 // Declarar ou alterar o valor de variáveis
-void vars() throws Exception : { Token var; double a=0; }
+Object vars(Hashtable local) throws Exception : { Token var; Object a; }
 {
-  var = < VAR > < ATTRIB > a=sum()
+  var = < VAR > < ATTRIB > (a = list() |  a = < STRING > | a = sum(local))
   {
-    tbl.put ( var.image, new Float(a) );
+    if(local == null)
+    	tbl.put ( var.image, a );
+   	else
+   		local.put(var.image, a);
+   		
     System.out.println ( "Variável ["+var.image+"] criada/modificada!" );
-    return;
+    System.out.println("Conteúdo da variável: " + a);
+    return var;
   }
 }
 
-float sum()  throws Exception : { float a=0, b=0; Token tk; }
+Object sum(Hashtable local)  throws Exception : { Object a, b; Token tk; Double a1, b1; }
 {
-  a = term()
+  a = term(local)
   (
     (
       tk = < PLUS >
     | tk = < MINUS >
     )
-    b = term()
+    b = term(local)
     {
-      if (tk.image=="+")
-        a+=b;
-      else
-        a-=b;
+      if (tk.image=="+")      {
+       		a1 = Double.parseDouble(a.toString());
+         	b1 = Double.parseDouble(b.toString());
+       		a1 += b1;
+       		a = a1;      }
+      else      {
+       		a1 = Double.parseDouble(a.toString());
+         	b1 = Double.parseDouble(b.toString());
+       		a1 -= b1;
+       		b = a1;      }
     }        
   )*
   { return a; }
 }
 
-float term()  throws Exception : { float a=0, b=0; Token tk; }
+Object term(Hashtable local)  throws Exception : { Object a, b; Token tk; Double a1, b1;}
 {
-  a = unary()
+  a = unary(local)
   (
     (
       tk = < MULTIPLY >
     | tk = < DIVIDE >
     )
-    b = unary()
+    b = unary(local)
     {
-       if (tk.image=="*")
-        a*=b;
+       if (tk.image=="*")       {
+         	a1 = Double.parseDouble(a.toString());
+         	b1 = Double.parseDouble(b.toString());
+         	a1 *= b1;
+         	a = a1;       }
       else
-        a/=b;
+      {
+       		a1 = Double.parseDouble(a.toString());
+         	b1 = Double.parseDouble(b.toString());
+         	a1 /= b1;
+         	a = a1;      }
     }
   )*
   { return a; }   
 }
 
-float unary()  throws Exception :
-{float a=0; }
+Object unary(Hashtable local)  throws Exception :
+{Object a; }
 {
-  < MINUS > a=element() { return -a; }
-| a=element() { return a; }
+  < MINUS > a=element(local) { return -(Double)a; }
+| a=element(local) { return a; }
 }
 
-float element() throws Exception : 
+Object element(Hashtable local) throws Exception : 
 {
-  Token tk; float a=0;
+  Token tk; Object a=0;
 }
 {
-     tk = < INT_CONSTANT > { return Integer.parseInt ( tk.image ); }
-   | tk = < FLOAT >  { return Float.parseFloat ( tk.image ); }
+     tk = < INT_CONSTANT > { return tk.image ; }
+   | tk = < FLOAT >  { return tk.image; }
    | tk = < VAR >
    {
+      if(local != null && local.containsKey(tk.image))      	return local.get(tk.image);
+      	
       if (tbl.containsKey(tk.image))
-        return ((Float)tbl.get(tk.image)).floatValue();
+        return (tbl.get(tk.image));
+        
       throw new ParseException (
         "Variável ["+ tk.image + "] não localizada!"
       + " Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn );
    }
-   | "(" a = sum() ")" { return a; }
+   | "(" a = sum(local) ")" { return a; }
 }

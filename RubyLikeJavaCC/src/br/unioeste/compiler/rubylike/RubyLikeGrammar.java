@@ -13,8 +13,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   public static void main(String args []) throws ParseException
   {
-    boolean debug_as = false;
-    boolean debug_recovery = false;
+    boolean debug_as = true;
+    boolean debug_recovery = true;
 
     RubyLikeGrammar parser = new RubyLikeGrammar(System.in);
 
@@ -110,18 +110,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     try {
       if (jj_2_1(2)) {
         calc(g);
-                          {if (true) return 1;}
+                        {if (true) return 1;}
       } else if (jj_2_2(2)) {
-        vars();
-        jj_consume_token(END_CMD);
-      } else if (jj_2_3(2)) {
-        list(g);
-        jj_consume_token(END_CMD);
-      } else if (jj_2_4(2)) {
-        IfElse(g);
-      } else if (jj_2_5(2)) {
-        each(g);
-      } else if (jj_2_6(2)) {
         jj_consume_token(0);
                           {if (true) return 0;}
       } else {
@@ -135,182 +125,257 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void list(RecoverySet g) throws ParseException, Exception {
+  final public Object list() throws ParseException, Exception {
+        Object t; List<Object> lista = new ArrayList<Object>();
     jj_consume_token(LIST);
     jj_consume_token(LPAREN);
+    label_1:
+    while (true) {
+      if (jj_2_3(2)) {
+        t = jj_consume_token(INT_CONSTANT);
+      } else if (jj_2_4(2)) {
+        t = jj_consume_token(STRING);
+      } else if (jj_2_5(2)) {
+        t = jj_consume_token(FLOAT);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      if (jj_2_6(2)) {
+        ;
+      } else {
+        break label_1;
+      }
+    }
+    label_2:
+    while (true) {
+      if (jj_2_7(2)) {
+        ;
+      } else {
+        break label_2;
+      }
+      if (jj_2_8(2)) {
+        jj_consume_token(COMMA);
+        t = jj_consume_token(INT_CONSTANT);
+      } else if (jj_2_9(2)) {
+        t = jj_consume_token(STRING);
+      } else if (jj_2_10(2)) {
+        t = jj_consume_token(FLOAT);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    jj_consume_token(RPAREN);
+                lista.add(t);
+   {if (true) return lista;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public void IfElse(RecoverySet g) throws ParseException, Exception {
+        boolean cond = false;
+    if (jj_2_11(2)) {
+      jj_consume_token(IF);
+      jj_consume_token(LPAREN);
+      expressionLogical(g);
+      jj_consume_token(RPAREN);
+      jj_consume_token(LBRACE);
+      ifBlock(g);
+      jj_consume_token(RBRACE);
+      jj_consume_token(ELSE);
+      jj_consume_token(LBRACE);
+      elseBlock(g);
+      jj_consume_token(RBRACE);
+    } else if (jj_2_12(2)) {
+      jj_consume_token(IF);
+      jj_consume_token(LPAREN);
+      expressionLogical(g);
+      jj_consume_token(RPAREN);
+      jj_consume_token(LBRACE);
+      ifBlock(g);
+      jj_consume_token(RBRACE);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void expressionLogical(RecoverySet g) throws ParseException, Exception {
+    if (jj_2_13(2)) {
+      jj_consume_token(VAR);
+      opExpression();
+      jj_consume_token(VAR);
+    } else if (jj_2_14(2)) {
+      jj_consume_token(INT_CONSTANT);
+      opExpression();
+      jj_consume_token(INT_CONSTANT);
+    } else if (jj_2_15(2)) {
+      jj_consume_token(VAR);
+      opExpression();
+      jj_consume_token(INT_CONSTANT);
+    } else if (jj_2_16(2)) {
+      jj_consume_token(INT_CONSTANT);
+      opExpression();
+      jj_consume_token(VAR);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void opExpression() throws ParseException {
+    if (jj_2_17(2)) {
+      jj_consume_token(AND);
+    } else if (jj_2_18(2)) {
+      jj_consume_token(OR);
+    } else if (jj_2_19(2)) {
+      jj_consume_token(MINOR);
+    } else if (jj_2_20(2)) {
+      jj_consume_token(MAJOR);
+    } else if (jj_2_21(2)) {
+      jj_consume_token(EQUALS);
+    } else if (jj_2_22(2)) {
+      jj_consume_token(MINOR_EQUAL);
+    } else if (jj_2_23(2)) {
+      jj_consume_token(MAJOR_EQUAL);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void ifBlock(RecoverySet g) throws ParseException, Exception {
     try {
-      if (jj_2_10(2)) {
-        label_1:
-        while (true) {
-          vars();
-          jj_consume_token(SEMICOLON);
-          if (jj_2_7(2)) {
-            ;
-          } else {
-            break label_1;
-          }
-        }
-      } else if (jj_2_11(2)) {
-        label_2:
-        while (true) {
-          jj_consume_token(INT_CONSTANT);
-          jj_consume_token(SEMICOLON);
-          if (jj_2_8(2)) {
-            ;
-          } else {
-            break label_2;
-          }
-        }
-      } else if (jj_2_12(2)) {
+      if (jj_2_26(2)) {
         label_3:
         while (true) {
-          jj_consume_token(STRING);
-          jj_consume_token(SEMICOLON);
-          if (jj_2_9(2)) {
+          if (jj_2_24(2)) {
             ;
           } else {
             break label_3;
           }
+          vars(null);
         }
+        jj_consume_token(END_CMD);
+      } else if (jj_2_27(2)) {
+        label_4:
+        while (true) {
+          if (jj_2_25(2)) {
+            ;
+          } else {
+            break label_4;
+          }
+          IfElse(g);
+        }
+        jj_consume_token(END_CMD);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
       }
     } catch (ParseException e) {
-                  consumeUntil(g, e, "list");
-    }
-    jj_consume_token(RPAREN);
-  }
-
-  final public void IfElse(RecoverySet g) throws ParseException, Exception {
-    jj_consume_token(IF);
-    expression(g);
-    ifBlock(g);
-    jj_consume_token(ELSE);
-    elseBlock(g);
-  }
-
-  final public void expression(RecoverySet g) throws ParseException, Exception {
-    jj_consume_token(LPAREN);
-    try {
-      label_4:
-      while (true) {
-        if (jj_2_16(2)) {
-          jj_consume_token(INT_CONSTANT);
-        } else if (jj_2_17(2)) {
-          jj_consume_token(STRING);
-        } else if (jj_2_18(2)) {
-          vars();
-          label_5:
-          while (true) {
-            if (jj_2_13(2)) {
-              jj_consume_token(AND);
-            } else if (jj_2_14(2)) {
-              jj_consume_token(OR);
-            } else {
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
-            if (jj_2_15(2)) {
-              ;
-            } else {
-              break label_5;
-            }
-          }
-          jj_consume_token(INT_CONSTANT);
-        } else if (jj_2_19(2)) {
-          jj_consume_token(STRING);
-        } else if (jj_2_20(2)) {
-          vars();
-        } else {
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-        if (jj_2_21(2)) {
-          ;
-        } else {
-          break label_4;
-        }
-      }
-    } catch (ParseException e) {
-                        consumeUntil(g, e, "expression");
-    }
-    jj_consume_token(RPAREN);
-  }
-
-  final public void ifBlock(RecoverySet g) throws ParseException, Exception {
-    jj_consume_token(LBRACE);
-    try {
-      label_6:
-      while (true) {
-        vars();
-        if (jj_2_22(2)) {
-          ;
-        } else {
-          break label_6;
-        }
-      }
-      jj_consume_token(END_CMD);
-    } catch (ParseException e) {
                         consumeUntil(g, e, "ifBlock");
     }
-    jj_consume_token(RBRACE);
   }
 
   final public void elseBlock(RecoverySet g) throws ParseException, Exception {
-    jj_consume_token(LBRACE);
     try {
-      label_7:
-      while (true) {
-        vars();
-        if (jj_2_23(2)) {
-          ;
-        } else {
-          break label_7;
+      if (jj_2_30(2)) {
+        label_5:
+        while (true) {
+          if (jj_2_28(2)) {
+            ;
+          } else {
+            break label_5;
+          }
+          vars(null);
         }
+        jj_consume_token(END_CMD);
+      } else if (jj_2_31(2)) {
+        label_6:
+        while (true) {
+          if (jj_2_29(2)) {
+            ;
+          } else {
+            break label_6;
+          }
+          IfElse(g);
+        }
+        jj_consume_token(END_CMD);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
       }
-      jj_consume_token(END_CMD);
     } catch (ParseException e) {
                         consumeUntil(g, e, "elseBlock");
     }
-    jj_consume_token(RBRACE);
   }
 
   final public void each(RecoverySet g) throws ParseException, Exception {
     jj_consume_token(EACH);
-    expression(g);
+    jj_consume_token(LPAREN);
+    eachExp(g);
+    jj_consume_token(RPAREN);
+    jj_consume_token(LBRACE);
     eachBlock(g);
+    jj_consume_token(RBRACE);
+  }
+
+  final public void eachExp(RecoverySet g) throws ParseException, Exception {
+    try {
+      jj_consume_token(VAR);
+      jj_consume_token(SETA);
+      jj_consume_token(VAR);
+    } catch (ParseException e) {
+    consumeUntil(g, e, "eachExp");
+    }
   }
 
   final public void eachBlock(RecoverySet g) throws ParseException, Exception {
-    jj_consume_token(LBRACE);
     try {
-      label_8:
-      while (true) {
-        if (jj_2_24(2)) {
-          ;
-        } else {
-          break label_8;
+      if (jj_2_34(2)) {
+        label_7:
+        while (true) {
+          if (jj_2_32(2)) {
+            ;
+          } else {
+            break label_7;
+          }
+          vars(null);
         }
-        vars();
+        jj_consume_token(END_CMD);
+      } else if (jj_2_35(2)) {
+        label_8:
+        while (true) {
+          if (jj_2_33(2)) {
+            ;
+          } else {
+            break label_8;
+          }
+          IfElse(g);
+        }
+        jj_consume_token(END_CMD);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
       }
     } catch (ParseException e) {
                         consumeUntil(g, e, "eachBlock");
     }
-    jj_consume_token(RBRACE);
   }
 
   final public void calc(RecoverySet f) throws ParseException, Exception {
   double a = 0;
   RecoverySet g = First.calc.union ( f );
     try {
-      if (jj_2_26(2)) {
-        vars();
+      if (jj_2_36(2)) {
+        each(g);
         jj_consume_token(END_CMD);
-      } else if (jj_2_27(2)) {
-        a = sum();
+      } else if (jj_2_37(2)) {
+        IfElse(g);
         jj_consume_token(END_CMD);
-                                          mostrarResult( a );
+      } else if (jj_2_38(2)) {
+        vars(null);
+        jj_consume_token(END_CMD);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
@@ -322,81 +387,116 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   }
 
 // Declarar ou alterar o valor de variáveis
-  final public void vars() throws ParseException, Exception {
-                                 Token var; double a=0;
+  final public Object vars(Hashtable local) throws ParseException, Exception {
+                                                  Token var; Object a;
     var = jj_consume_token(VAR);
     jj_consume_token(ATTRIB);
-    a = sum();
-    tbl.put ( var.image, new Float(a) );
+    if (jj_2_39(2)) {
+      a = list();
+    } else if (jj_2_40(2)) {
+      a = jj_consume_token(STRING);
+    } else if (jj_2_41(2)) {
+      a = sum(local);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    if(local == null)
+        tbl.put ( var.image, a );
+        else
+                local.put(var.image, a);
+
     System.out.println ( "Vari\u00e1vel ["+var.image+"] criada/modificada!" );
-    {if (true) return;}
+    System.out.println("Conte\u00fado da vari\u00e1vel: " + a);
+    {if (true) return var;}
+    throw new Error("Missing return statement in function");
   }
 
-  final public float sum() throws ParseException, Exception {
-                                  float a=0, b=0; Token tk;
-    a = term();
-    label_10:
+  final public Object sum(Hashtable local) throws ParseException, Exception {
+                                                  Object a, b; Token tk; Double a1, b1;
+    a = term(local);
+    label_9:
     while (true) {
-      if (jj_2_28(2)) {
+      if (jj_2_42(2)) {
         ;
       } else {
-        break label_10;
+        break label_9;
       }
-      if (jj_2_29(2)) {
+      if (jj_2_43(2)) {
         tk = jj_consume_token(PLUS);
-      } else if (jj_2_30(2)) {
+      } else if (jj_2_44(2)) {
         tk = jj_consume_token(MINUS);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      b = term();
+      b = term(local);
       if (tk.image=="+")
-        a+=b;
+      {
+                a1 = Double.parseDouble(a.toString());
+                b1 = Double.parseDouble(b.toString());
+                a1 += b1;
+                a = a1;
+      }
       else
-        a-=b;
+      {
+                a1 = Double.parseDouble(a.toString());
+                b1 = Double.parseDouble(b.toString());
+                a1 -= b1;
+                b = a1;
+      }
     }
     {if (true) return a;}
     throw new Error("Missing return statement in function");
   }
 
-  final public float term() throws ParseException, Exception {
-                                   float a=0, b=0; Token tk;
-    a = unary();
-    label_11:
+  final public Object term(Hashtable local) throws ParseException, Exception {
+                                                   Object a, b; Token tk; Double a1, b1;
+    a = unary(local);
+    label_10:
     while (true) {
-      if (jj_2_31(2)) {
+      if (jj_2_45(2)) {
         ;
       } else {
-        break label_11;
+        break label_10;
       }
-      if (jj_2_32(2)) {
+      if (jj_2_46(2)) {
         tk = jj_consume_token(MULTIPLY);
-      } else if (jj_2_33(2)) {
+      } else if (jj_2_47(2)) {
         tk = jj_consume_token(DIVIDE);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      b = unary();
+      b = unary(local);
        if (tk.image=="*")
-        a*=b;
+       {
+                a1 = Double.parseDouble(a.toString());
+                b1 = Double.parseDouble(b.toString());
+                a1 *= b1;
+                a = a1;
+       }
       else
-        a/=b;
+      {
+                a1 = Double.parseDouble(a.toString());
+                b1 = Double.parseDouble(b.toString());
+                a1 /= b1;
+                a = a1;
+      }
     }
     {if (true) return a;}
     throw new Error("Missing return statement in function");
   }
 
-  final public float unary() throws ParseException, Exception {
- float a=0;
-    if (jj_2_34(2)) {
+  final public Object unary(Hashtable local) throws ParseException, Exception {
+ Object a;
+    if (jj_2_48(2)) {
       jj_consume_token(MINUS);
-      a = element();
-                          {if (true) return -a;}
-    } else if (jj_2_35(2)) {
-      a = element();
-                {if (true) return a;}
+      a = element(local);
+                               {if (true) return -(Double)a;}
+    } else if (jj_2_49(2)) {
+      a = element(local);
+                     {if (true) return a;}
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -404,26 +504,30 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public float element() throws ParseException, Exception {
-  Token tk; float a=0;
-    if (jj_2_36(2)) {
+  final public Object element(Hashtable local) throws ParseException, Exception {
+  Token tk; Object a=0;
+    if (jj_2_50(2)) {
       tk = jj_consume_token(INT_CONSTANT);
-                             {if (true) return Integer.parseInt ( tk.image );}
-    } else if (jj_2_37(2)) {
+                             {if (true) return tk.image ;}
+    } else if (jj_2_51(2)) {
       tk = jj_consume_token(FLOAT);
-                       {if (true) return Float.parseFloat ( tk.image );}
-    } else if (jj_2_38(2)) {
+                       {if (true) return tk.image;}
+    } else if (jj_2_52(2)) {
       tk = jj_consume_token(VAR);
+      if(local != null && local.containsKey(tk.image))
+        {if (true) return local.get(tk.image);}
+
       if (tbl.containsKey(tk.image))
-        {if (true) return ((Float)tbl.get(tk.image)).floatValue();}
+        {if (true) return (tbl.get(tk.image));}
+
       {if (true) throw new ParseException (
         "Vari\u00e1vel ["+ tk.image + "] n\u00e3o localizada!"
       + " Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn );}
-    } else if (jj_2_39(2)) {
+    } else if (jj_2_53(2)) {
       jj_consume_token(LPAREN);
-      a = sum();
+      a = sum(local);
       jj_consume_token(RPAREN);
-                         {if (true) return a;}
+                              {if (true) return a;}
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -704,141 +808,152 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     finally { jj_save(38, xla); }
   }
 
-  private boolean jj_3_16() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
+  private boolean jj_2_40(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_40(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(39, xla); }
+  }
+
+  private boolean jj_2_41(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_41(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(40, xla); }
+  }
+
+  private boolean jj_2_42(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_42(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(41, xla); }
+  }
+
+  private boolean jj_2_43(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_43(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(42, xla); }
+  }
+
+  private boolean jj_2_44(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_44(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(43, xla); }
+  }
+
+  private boolean jj_2_45(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_45(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(44, xla); }
+  }
+
+  private boolean jj_2_46(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_46(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(45, xla); }
+  }
+
+  private boolean jj_2_47(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_47(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(46, xla); }
+  }
+
+  private boolean jj_2_48(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_48(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(47, xla); }
+  }
+
+  private boolean jj_2_49(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_49(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(48, xla); }
+  }
+
+  private boolean jj_2_50(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_50(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(49, xla); }
+  }
+
+  private boolean jj_2_51(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_51(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(50, xla); }
+  }
+
+  private boolean jj_2_52(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_52(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(51, xla); }
+  }
+
+  private boolean jj_2_53(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_53(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(52, xla); }
+  }
+
+  private boolean jj_3_39() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
-  private boolean jj_3_21() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_16()) {
-    jj_scanpos = xsp;
-    if (jj_3_17()) {
-    jj_scanpos = xsp;
-    if (jj_3_18()) {
-    jj_scanpos = xsp;
-    if (jj_3_19()) {
-    jj_scanpos = xsp;
-    if (jj_3_20()) return true;
-    }
-    }
-    }
-    }
+  private boolean jj_3_5() {
+    if (jj_scan_token(FLOAT)) return true;
     return false;
   }
 
-  private boolean jj_3_33() {
-    if (jj_scan_token(DIVIDE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_32() {
-    if (jj_scan_token(MULTIPLY)) return true;
-    return false;
-  }
-
-  private boolean jj_3_20() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_31() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_32()) {
-    jj_scanpos = xsp;
-    if (jj_3_33()) return true;
-    }
-    if (jj_3R_19()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    if (jj_3R_19()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_31()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_19() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_30() {
+  private boolean jj_3_44() {
     if (jj_scan_token(MINUS)) return true;
     return false;
   }
 
-  private boolean jj_3_29() {
+  private boolean jj_3_43() {
     if (jj_scan_token(PLUS)) return true;
     return false;
   }
 
-  private boolean jj_3_9() {
-    if (jj_scan_token(STRING)) return true;
-    if (jj_scan_token(SEMICOLON)) return true;
-    return false;
-  }
-
-  private boolean jj_3_28() {
+  private boolean jj_3_42() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_29()) {
+    if (jj_3_43()) {
     jj_scanpos = xsp;
-    if (jj_3_30()) return true;
+    if (jj_3_44()) return true;
     }
     if (jj_3R_18()) return true;
     return false;
   }
 
-  private boolean jj_3_12() {
-    Token xsp;
-    if (jj_3_9()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_9()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3_23() {
+    if (jj_scan_token(MAJOR_EQUAL)) return true;
     return false;
   }
 
-  private boolean jj_3_8() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    if (jj_scan_token(SEMICOLON)) return true;
+  private boolean jj_3_22() {
+    if (jj_scan_token(MINOR_EQUAL)) return true;
     return false;
   }
 
-  private boolean jj_3_11() {
-    Token xsp;
-    if (jj_3_8()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_8()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3_21() {
+    if (jj_scan_token(EQUALS)) return true;
     return false;
   }
 
-  private boolean jj_3_7() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    Token xsp;
-    if (jj_3_7()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_7()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3_20() {
+    if (jj_scan_token(MAJOR)) return true;
     return false;
   }
 
@@ -847,20 +962,92 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_28()) { jj_scanpos = xsp; break; }
+      if (jj_3_42()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  private boolean jj_3_27() {
-    if (jj_3R_17()) return true;
-    if (jj_scan_token(END_CMD)) return true;
+  private boolean jj_3_19() {
+    if (jj_scan_token(MINOR)) return true;
     return false;
   }
 
-  private boolean jj_3R_15() {
-    if (jj_scan_token(IF)) return true;
-    if (jj_3R_21()) return true;
+  private boolean jj_3_18() {
+    if (jj_scan_token(OR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_17()) {
+    jj_scanpos = xsp;
+    if (jj_3_18()) {
+    jj_scanpos = xsp;
+    if (jj_3_19()) {
+    jj_scanpos = xsp;
+    if (jj_3_20()) {
+    jj_scanpos = xsp;
+    if (jj_3_21()) {
+    jj_scanpos = xsp;
+    if (jj_3_22()) {
+    jj_scanpos = xsp;
+    if (jj_3_23()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_17() {
+    if (jj_scan_token(AND)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_53() {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  private boolean jj_3_37() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_16() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_15() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_36() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_14() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -870,8 +1057,271 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
+  private boolean jj_3_13() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_33() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_35() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_33()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_38() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3_32() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3_34() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_32()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_52() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_51() {
+    if (jj_scan_token(FLOAT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_50()) {
+    jj_scanpos = xsp;
+    if (jj_3_51()) {
+    jj_scanpos = xsp;
+    if (jj_3_52()) {
+    jj_scanpos = xsp;
+    if (jj_3_53()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_50() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_36()) {
+    jj_scanpos = xsp;
+    if (jj_3_37()) {
+    jj_scanpos = xsp;
+    if (jj_3_38()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_12() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3_9()) {
+    jj_scanpos = xsp;
+    if (jj_3_10()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_11()) {
+    jj_scanpos = xsp;
+    if (jj_3_12()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_3()) {
+    jj_scanpos = xsp;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3_5()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_49() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_48()) {
+    jj_scanpos = xsp;
+    if (jj_3_49()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_48() {
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(0)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    if (jj_scan_token(LIST)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_29() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_31() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_29()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_41() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  private boolean jj_3_28() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3_30() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_28()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_47() {
+    if (jj_scan_token(DIVIDE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_scan_token(EACH)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_46() {
+    if (jj_scan_token(MULTIPLY)) return true;
+    return false;
+  }
+
+  private boolean jj_3_45() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_46()) {
+    jj_scanpos = xsp;
+    if (jj_3_47()) return true;
+    }
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
   private boolean jj_3_25() {
-    if (jj_3R_15()) return true;
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_18() {
+    if (jj_3R_19()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_45()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_27() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_25()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
     return false;
   }
 
@@ -881,157 +1331,22 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   }
 
   private boolean jj_3_26() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_14() {
-    if (jj_scan_token(OR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_scan_token(0)) return true;
-    return false;
-  }
-
-  private boolean jj_3_5() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
     Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_26()) {
-    jj_scanpos = xsp;
-    if (jj_3_27()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_24()) { jj_scanpos = xsp; break; }
     }
+    if (jj_scan_token(END_CMD)) return true;
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_3() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    if (jj_scan_token(LIST)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_13()) {
-    jj_scanpos = xsp;
-    if (jj_3_14()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_13() {
-    if (jj_scan_token(AND)) return true;
-    return false;
-  }
-
-  private boolean jj_3_39() {
-    if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  private boolean jj_3_18() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_23() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_16() {
-    if (jj_scan_token(EACH)) return true;
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3_38() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_37() {
-    if (jj_scan_token(FLOAT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) {
-    jj_scanpos = xsp;
-    if (jj_3_38()) {
-    jj_scanpos = xsp;
-    if (jj_3_39()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_36() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_17() {
+  private boolean jj_3_40() {
     if (jj_scan_token(STRING)) return true;
     return false;
   }
 
-  private boolean jj_3_22() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_35() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_34()) {
-    jj_scanpos = xsp;
-    if (jj_3_35()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_34() {
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_20()) return true;
+  private boolean jj_3_10() {
+    if (jj_scan_token(FLOAT)) return true;
     return false;
   }
 
@@ -1059,7 +1374,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[39];
+  final private JJCalls[] jj_2_rtns = new JJCalls[53];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1243,7 +1558,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[45];
+    boolean[] la1tokens = new boolean[46];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1260,7 +1575,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         }
       }
     }
-    for (int i = 0; i < 45; i++) {
+    for (int i = 0; i < 46; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -1287,7 +1602,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 39; i++) {
+    for (int i = 0; i < 53; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1333,6 +1648,20 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
             case 36: jj_3_37(); break;
             case 37: jj_3_38(); break;
             case 38: jj_3_39(); break;
+            case 39: jj_3_40(); break;
+            case 40: jj_3_41(); break;
+            case 41: jj_3_42(); break;
+            case 42: jj_3_43(); break;
+            case 43: jj_3_44(); break;
+            case 44: jj_3_45(); break;
+            case 45: jj_3_46(); break;
+            case 46: jj_3_47(); break;
+            case 47: jj_3_48(); break;
+            case 48: jj_3_49(); break;
+            case 49: jj_3_50(); break;
+            case 50: jj_3_51(); break;
+            case 51: jj_3_52(); break;
+            case 52: jj_3_53(); break;
           }
         }
         p = p.next;
