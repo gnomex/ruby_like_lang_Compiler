@@ -4,6 +4,7 @@
   LOOKAHEAD = 2;
   DEBUG_PARSER = false;}PARSER_BEGIN(RubyLikeGrammar)package br.unioeste.compiler.rubylike;
 
+import javax.swing.JTextArea;
 import java.io.*;
 import java.util.*;
 import br.unioeste.compiler.recovery.*;
@@ -11,9 +12,37 @@ import br.unioeste.compiler.recovery.*;
 public class RubyLikeGrammar{
     int contParseError; // Contador de erros sintáticos
     boolean debug_recovery; // Controla a verbose de recuperação de erros
-
+	JTextArea erros;
+	
     Hashtable tbl = new Hashtable ();
-      public static void main(String args []) throws ParseException  {
+
+    public void compilar ( boolean debug_as, boolean debug_recovery, JTextArea errorArea)  {
+	this.erros = errorArea;
+    this.debug_recovery = debug_recovery;    
+    if (!debug_as) this.disable_tracing();
+
+    int b=1;
+    while (b==1) {
+      //erros.setText("Lendo da entrada padrão...");
+      //erros.append("Expressão \"1+(2+3)*4;\" ou atribuição :");
+      try {
+        b = this.program();
+        switch (b) {
+          case 0 :  erros.append("Goodbye.\n");
+                    break;
+          case 1 :  erros.append("OK.\n");
+                    break;
+          default : break;
+        }
+      }	        
+      catch (Exception e) {
+        erros.append("Oops.\n");
+        erros.append(e.getMessage()+ "\n");
+        break;
+      }
+    }
+  }
+    public static void main(String args []) throws ParseException  {
     boolean debug_as = true;
     boolean debug_recovery = true;
     RubyLikeGrammar parser = new RubyLikeGrammar(System.in);

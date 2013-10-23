@@ -28,4 +28,8 @@ public class Editor extends JPanel{
 		
 		add(scroll, BorderLayout.CENTER);
 	}
+	
+	public JTextArea getEditorTextArea(){
+		return area;
+	}
 }

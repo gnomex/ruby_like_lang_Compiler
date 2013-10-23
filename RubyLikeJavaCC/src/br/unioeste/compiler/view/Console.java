@@ -29,4 +29,8 @@ public class Console extends JPanel{
 		
 		add(scroll, BorderLayout.CENTER);
 	}
+	
+	public JTextArea getConsoleTextArea(){
+		return area;
+	}
 }

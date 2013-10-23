@@ -5,12 +5,16 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.InputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+
+import br.unioeste.compiler.rubylike.RubyLikeGrammar;
 
 public class Main extends JFrame{
 
@@ -22,6 +26,8 @@ public class Main extends JFrame{
 	
 	private Editor editor;
 	private Console console;
+	
+	private RubyLikeGrammar ruby;
 	
 	public Main(){
 		super("Ruby Like");
@@ -48,6 +54,7 @@ public class Main extends JFrame{
 		itemCompiler = new JMenuItem("Compilar");
 		itemCompiler.setAccelerator(KeyStroke.getKeyStroke("control C"));
 		itemCompiler.setMnemonic(KeyEvent.VK_C);
+		itemCompiler.addActionListener(new Compiler());
 		
 		menuBuild.add(itemCompiler);
 		menuBuild.addSeparator();
@@ -76,4 +83,32 @@ public class Main extends JFrame{
 		}
 		
 	}
+	
+	private class Compiler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			ruby = new RubyLikeGrammar(text2imputStream(editor.getEditorTextArea()));
+			console.getConsoleTextArea().setText("");
+			ruby.compilar(true, true, console.getConsoleTextArea());
+		}
+		
+	}
+	public InputStream text2imputStream ( final JTextArea ta ) { 
+		return new InputStream()
+		{ 
+			String s = ta.getText();  
+			int inPtr=0;
+			@Override
+			public int read()  //minimum implementation of an InputStream
+			{ 
+				if( inPtr >= s.length() ) 
+					return -1;
+				else { 
+					inPtr++; 
+					return s.charAt(inPtr-1); 
+				}
+			}//read
+		};//InputStream
+	}//text2imputStream
 }
