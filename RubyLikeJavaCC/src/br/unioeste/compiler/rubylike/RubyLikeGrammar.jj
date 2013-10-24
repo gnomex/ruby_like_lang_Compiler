@@ -23,8 +23,6 @@ public class RubyLikeGrammar{
 
     int b=1;
     while (b==1) {
-      //erros.setText("Lendo da entrada padrão...");
-      //erros.append("Expressão \"1+(2+3)*4;\" ou atribuição :");
       try {
         b = this.program();
         switch (b) {
@@ -107,9 +105,9 @@ public class RubyLikeGrammar{
      Token tok;
      eof=false; // FIXME
      if (debug_recovery) { // Informação sobre a recuperação
-       //erros.append("");
-       //erros.append( "*** " + met + " *** ");
-       //erros.append( " Syncronizing Set: "+ g );
+       erros.append("");
+       erros.append( "*** " + met + " *** ");
+       erros.append( " Syncronizing Set: "+ g );
      }
      if (g==null) throw e; // se o conjunto de recuperação é null, propaga a exceção
 
@@ -117,11 +115,11 @@ public class RubyLikeGrammar{
      while (!eof) {
        if ( g.contains ( tok.kind ) ) {
          if ( debug_recovery )
-           //erros.append( " Found syncronizing token: " + im (tok.kind));
+           erros.append( " Found syncronizing token: " + im (tok.kind));
          break;
        }
        if (debug_recovery)
-         //erros.append( " Ignorando token "+ im ( tok.kind));
+         erros.append( " Ignorando token "+ im ( tok.kind));
        getNextToken();
        tok = getToken(1);
        if (tok.kind==EOF && !g.contains(EOF) )
@@ -196,22 +194,30 @@ int program() throws Exception:{
   	}}
 
 Object list() throws Exception:{
-  	Object t; List<Object> lista = new ArrayList<Object>();}
+  	Token t; List<Object> lista = new ArrayList<Object>();}
 {
   < LIST >
   	< LPAREN >
-  		(t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT >)+
-  		("," t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT >)*
+  		(t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)
+  		{
+  	  		System.out.println(t.image);
+   			lista.add(t.image);
+  		}
+  		("," t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)*
+  		{
+  	  		System.out.println(t.image);
+   			lista.add(t.image);
+  		}
+  		
   	< RPAREN >
-  	{
-   		lista.add(t);  	}
+  	
   	
   {return lista;}}
 
 void IfElse(RecoverySet g) throws Exception:{
  	boolean cond = false;}
 {
-  < IF > "(" expressionLogical(g) ")" "{" ifBlock(g) "}" < ELSE > "{" elseBlock(g) "}" |  < IF > "(" expressionLogical(g) ")" "{" ifBlock(g) "}"    }
+  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE > < ELSE > < LBRACE > elseBlock(g) < RBRACE > |  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE >    }
 
 void expressionLogical(RecoverySet g) throws Exception:
 {}
@@ -230,22 +236,22 @@ void opExpression():{}
  	| < MINOR_EQUAL >
  	| < MAJOR_EQUAL >}
 void ifBlock(RecoverySet g) throws Exception:{}{
-		try		{
-		 	(vars(null))* < END_CMD >
-			| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "ifBlock");		}}
+	try	{
+		 (vars(null))* < END_CMD >
+		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
+		consumeUntil(g, e, "ifBlock");	}}
 
 void elseBlock(RecoverySet g) throws Exception:
 {}
 {
-		try		{
-		  	(vars(null))* < END_CMD >
-		 	| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "elseBlock");		}}
+	try	{
+		(vars(null))* < END_CMD >
+		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
+		consumeUntil(g, e, "elseBlock");	}}
 
 void each(RecoverySet g) throws Exception:{}
 {
-	< EACH > "(" eachExp(g) ")" "{" eachBlock(g) "}"}
+	< EACH > < LPAREN > eachExp(g) < RPAREN > < LBRACE > eachBlock(g) < RBRACE >}
 
 void eachExp(RecoverySet g) throws Exception:
 {}
@@ -257,10 +263,36 @@ void eachExp(RecoverySet g) throws Exception:
 
 void eachBlock(RecoverySet g) throws Exception:{}
 {
-		try		{
-		 	(vars(null))* < END_CMD >
-		 	| (IfElse(g))* < END_CMD >		}catch(ParseException e)		{
-		  	consumeUntil(g, e, "eachBlock");		}}
+	try	{
+		(vars(null))* < END_CMD >
+		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
+		consumeUntil(g, e, "eachBlock");	}}
+
+void print(Hashtable local):{
+  Token token; List<Object> list;}
+{
+	< PRINT > ( token = < VAR > | token = < INT_CONSTANT > | token = < STRING >)+
+	{
+	  if(local != null && local.containsKey(token.image))	  {
+	    if(local.get(token.image) instanceof ArrayList)	    {
+	      list = (ArrayList<Object>) local.get(token.image);
+	      for(int i = 0; i < list.size(); i++)
+	        erros.append(list.get(i).toString() + " ");
+	      erros.append("\n");	    }
+	    else
+	    	erros.append(local.get(token.image).toString() + "\n");	  }
+	  else if(tbl.containsKey(token.image))
+	  {
+	    if(tbl.get(token.image) instanceof ArrayList)	    {
+	      list = (ArrayList<Object>) tbl.get(token.image);
+	      for(int i = 0; i < list.size(); i++)
+	        erros.append(list.get(i).toString() + " ");
+	      erros.append("\n");	    }
+	    else
+	    	erros.append(tbl.get(token.image).toString() + "\n");	  }
+	  	
+	  else
+	  	erros.append(token.image + "\n");	} }
 
 void calc (RecoverySet f) throws Exception :
 { double a = 0;
@@ -268,13 +300,13 @@ void calc (RecoverySet f) throws Exception :
 }
 {
   try  {
-		each(g) 		< END_CMD >
-		| IfElse(g)		< END_CMD >
-    	| vars(null)    	< END_CMD >
-    	
+	each(g) 		< END_CMD >
+	| IfElse(g)		< END_CMD >
+    | vars(null)    < END_CMD >
+    | print(null)	< END_CMD >	
   } catch ( ParseException e ) {
-		consumeUntil ( g, e, "calc" );
-		getNextToken();
+	consumeUntil ( g, e, "calc" );
+	getNextToken();
   }  
 }
 
@@ -288,8 +320,8 @@ Object vars(Hashtable local) throws Exception : { Token var; Object a; }
    	else
    		local.put(var.image, a);
    		
-    System.out.println ( "Variável ["+var.image+"] criada/modificada!" );
-    System.out.println("Conteúdo da variável: " + a);
+    erros.append( "Variável ["+var.image+"] criada/modificada!" + "\n" );
+    erros.append("Conteúdo da variável: " + a + "\n");
     return var;
   }
 }
@@ -369,6 +401,9 @@ Object element(Hashtable local) throws Exception :
       throw new ParseException (
         "Variável ["+ tk.image + "] não localizada!"
       + " Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn );
+
+      erros.append("Variável ["+ tk.image + "] não localizada!" + "\n");
+      erros.append(" Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn + "\n");
    }
    | "(" a = sum(local) ")" { return a; }
 }

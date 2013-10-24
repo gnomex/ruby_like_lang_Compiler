@@ -32,7 +32,7 @@ public class Main extends JFrame{
 	public Main(){
 		super("Ruby Like");
 		
-		setSize(new Dimension(600, 580));
+		setSize(new Dimension(600, 630));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
@@ -72,6 +72,7 @@ public class Main extends JFrame{
 	public static void main(String[] args) {
 		Main main = new Main();
 		main.setVisible(true);
+		
 	}
 
 	private class CloseRubyLike implements ActionListener{

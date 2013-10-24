@@ -20,8 +20,6 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
     int b=1;
     while (b==1) {
-      //erros.setText("Lendo da entrada padrão...");
-      //erros.append("Expressão \"1+(2+3)*4;\" ou atribuição :");
       try {
         b = this.program();
         switch (b) {
@@ -53,8 +51,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
     int b=1;
     while (b==1) {
-      System.out.println("Lendo da entrada padr\u00e3o...");
-      System.out.print("Express\u00e3o \u005c"1+(2+3)*4;\u005c" ou atribui\u00e7\u00e3o :");
+      System.out.println("Lendo da entrada padr\u00c3\u00a3o...");
+      System.out.print("Express\u00c3\u00a3o \u005c"1+(2+3)*4;\u005c" ou atribui\u00c3\u00a7\u00c3\u00a3o :");
       try {
         b = parser.program();
         switch (b) {
@@ -109,9 +107,9 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
      Token tok;
      eof=false; // FIXME
      if (debug_recovery) { // Informação sobre a recuperação
-       //erros.append("");
-       //erros.append( "*** " + met + " *** ");
-       //erros.append( " Syncronizing Set: "+ g );
+       erros.append("");
+       erros.append( "*** " + met + " *** ");
+       erros.append( " Syncronizing Set: "+ g );
      }
      if (g==null) throw e; // se o conjunto de recuperação é null, propaga a exceção
 
@@ -119,11 +117,11 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
      while (!eof) {
        if ( g.contains ( tok.kind ) ) {
          if ( debug_recovery )
-           //erros.append( " Found syncronizing token: " + im (tok.kind));
+           erros.append( " Found syncronizing token: " + im (tok.kind));
          break;
        }
        if (debug_recovery)
-         //erros.append( " Ignorando token "+ im ( tok.kind));
+         erros.append( " Ignorando token "+ im ( tok.kind));
        getNextToken();
        tok = getToken(1);
        if (tok.kind==EOF && !g.contains(EOF) )
@@ -155,33 +153,29 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   }
 
   final public Object list() throws ParseException, Exception {
-        Object t; List<Object> lista = new ArrayList<Object>();
+        Token t; List<Object> lista = new ArrayList<Object>();
     jj_consume_token(LIST);
     jj_consume_token(LPAREN);
-    label_1:
-    while (true) {
-      if (jj_2_3(2)) {
-        t = jj_consume_token(INT_CONSTANT);
-      } else if (jj_2_4(2)) {
-        t = jj_consume_token(STRING);
-      } else if (jj_2_5(2)) {
-        t = jj_consume_token(FLOAT);
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      if (jj_2_6(2)) {
-        ;
-      } else {
-        break label_1;
-      }
+    if (jj_2_3(2)) {
+      t = jj_consume_token(INT_CONSTANT);
+    } else if (jj_2_4(2)) {
+      t = jj_consume_token(STRING);
+    } else if (jj_2_5(2)) {
+      t = jj_consume_token(FLOAT);
+    } else if (jj_2_6(2)) {
+      t = jj_consume_token(VAR);
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-    label_2:
+                        System.out.println(t.image);
+                        lista.add(t.image);
+    label_1:
     while (true) {
       if (jj_2_7(2)) {
         ;
       } else {
-        break label_2;
+        break label_1;
       }
       if (jj_2_8(2)) {
         jj_consume_token(COMMA);
@@ -190,20 +184,23 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         t = jj_consume_token(STRING);
       } else if (jj_2_10(2)) {
         t = jj_consume_token(FLOAT);
+      } else if (jj_2_11(2)) {
+        t = jj_consume_token(VAR);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
       }
     }
+                        System.out.println(t.image);
+                        lista.add(t.image);
     jj_consume_token(RPAREN);
-                lista.add(t);
    {if (true) return lista;}
     throw new Error("Missing return statement in function");
   }
 
   final public void IfElse(RecoverySet g) throws ParseException, Exception {
         boolean cond = false;
-    if (jj_2_11(2)) {
+    if (jj_2_12(2)) {
       jj_consume_token(IF);
       jj_consume_token(LPAREN);
       expressionLogical(g);
@@ -215,7 +212,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
       jj_consume_token(LBRACE);
       elseBlock(g);
       jj_consume_token(RBRACE);
-    } else if (jj_2_12(2)) {
+    } else if (jj_2_13(2)) {
       jj_consume_token(IF);
       jj_consume_token(LPAREN);
       expressionLogical(g);
@@ -230,19 +227,19 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   }
 
   final public void expressionLogical(RecoverySet g) throws ParseException, Exception {
-    if (jj_2_13(2)) {
+    if (jj_2_14(2)) {
       jj_consume_token(VAR);
       opExpression();
       jj_consume_token(VAR);
-    } else if (jj_2_14(2)) {
-      jj_consume_token(INT_CONSTANT);
-      opExpression();
-      jj_consume_token(INT_CONSTANT);
     } else if (jj_2_15(2)) {
-      jj_consume_token(VAR);
+      jj_consume_token(INT_CONSTANT);
       opExpression();
       jj_consume_token(INT_CONSTANT);
     } else if (jj_2_16(2)) {
+      jj_consume_token(VAR);
+      opExpression();
+      jj_consume_token(INT_CONSTANT);
+    } else if (jj_2_17(2)) {
       jj_consume_token(INT_CONSTANT);
       opExpression();
       jj_consume_token(VAR);
@@ -253,19 +250,19 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
   }
 
   final public void opExpression() throws ParseException {
-    if (jj_2_17(2)) {
+    if (jj_2_18(2)) {
       jj_consume_token(AND);
-    } else if (jj_2_18(2)) {
-      jj_consume_token(OR);
     } else if (jj_2_19(2)) {
-      jj_consume_token(MINOR);
+      jj_consume_token(OR);
     } else if (jj_2_20(2)) {
-      jj_consume_token(MAJOR);
+      jj_consume_token(MINOR);
     } else if (jj_2_21(2)) {
-      jj_consume_token(EQUALS);
+      jj_consume_token(MAJOR);
     } else if (jj_2_22(2)) {
-      jj_consume_token(MINOR_EQUAL);
+      jj_consume_token(EQUALS);
     } else if (jj_2_23(2)) {
+      jj_consume_token(MINOR_EQUAL);
+    } else if (jj_2_24(2)) {
       jj_consume_token(MAJOR_EQUAL);
     } else {
       jj_consume_token(-1);
@@ -275,24 +272,24 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   final public void ifBlock(RecoverySet g) throws ParseException, Exception {
     try {
-      if (jj_2_26(2)) {
-        label_3:
-        while (true) {
-          if (jj_2_24(2)) {
-            ;
-          } else {
-            break label_3;
-          }
-          vars(null);
-        }
-        jj_consume_token(END_CMD);
-      } else if (jj_2_27(2)) {
-        label_4:
+      if (jj_2_27(2)) {
+        label_2:
         while (true) {
           if (jj_2_25(2)) {
             ;
           } else {
-            break label_4;
+            break label_2;
+          }
+          vars(null);
+        }
+        jj_consume_token(END_CMD);
+      } else if (jj_2_28(2)) {
+        label_3:
+        while (true) {
+          if (jj_2_26(2)) {
+            ;
+          } else {
+            break label_3;
           }
           IfElse(g);
         }
@@ -302,30 +299,30 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-                        consumeUntil(g, e, "ifBlock");
+                consumeUntil(g, e, "ifBlock");
     }
   }
 
   final public void elseBlock(RecoverySet g) throws ParseException, Exception {
     try {
-      if (jj_2_30(2)) {
-        label_5:
-        while (true) {
-          if (jj_2_28(2)) {
-            ;
-          } else {
-            break label_5;
-          }
-          vars(null);
-        }
-        jj_consume_token(END_CMD);
-      } else if (jj_2_31(2)) {
-        label_6:
+      if (jj_2_31(2)) {
+        label_4:
         while (true) {
           if (jj_2_29(2)) {
             ;
           } else {
-            break label_6;
+            break label_4;
+          }
+          vars(null);
+        }
+        jj_consume_token(END_CMD);
+      } else if (jj_2_32(2)) {
+        label_5:
+        while (true) {
+          if (jj_2_30(2)) {
+            ;
+          } else {
+            break label_5;
           }
           IfElse(g);
         }
@@ -335,7 +332,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-                        consumeUntil(g, e, "elseBlock");
+                consumeUntil(g, e, "elseBlock");
     }
   }
 
@@ -361,24 +358,24 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   final public void eachBlock(RecoverySet g) throws ParseException, Exception {
     try {
-      if (jj_2_34(2)) {
-        label_7:
-        while (true) {
-          if (jj_2_32(2)) {
-            ;
-          } else {
-            break label_7;
-          }
-          vars(null);
-        }
-        jj_consume_token(END_CMD);
-      } else if (jj_2_35(2)) {
-        label_8:
+      if (jj_2_35(2)) {
+        label_6:
         while (true) {
           if (jj_2_33(2)) {
             ;
           } else {
-            break label_8;
+            break label_6;
+          }
+          vars(null);
+        }
+        jj_consume_token(END_CMD);
+      } else if (jj_2_36(2)) {
+        label_7:
+        while (true) {
+          if (jj_2_34(2)) {
+            ;
+          } else {
+            break label_7;
           }
           IfElse(g);
         }
@@ -388,30 +385,83 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-                        consumeUntil(g, e, "eachBlock");
+                consumeUntil(g, e, "eachBlock");
     }
+  }
+
+  final public void print(Hashtable local) throws ParseException {
+  Token token; List<Object> list;
+    jj_consume_token(PRINT);
+    label_8:
+    while (true) {
+      if (jj_2_37(2)) {
+        token = jj_consume_token(VAR);
+      } else if (jj_2_38(2)) {
+        token = jj_consume_token(INT_CONSTANT);
+      } else if (jj_2_39(2)) {
+        token = jj_consume_token(STRING);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      if (jj_2_40(2)) {
+        ;
+      } else {
+        break label_8;
+      }
+    }
+          if(local != null && local.containsKey(token.image))
+          {
+            if(local.get(token.image) instanceof ArrayList)
+            {
+              list = (ArrayList<Object>) local.get(token.image);
+              for(int i = 0; i < list.size(); i++)
+                erros.append(list.get(i).toString() + " ");
+              erros.append("\u005cn");
+            }
+            else
+                erros.append(local.get(token.image).toString() + "\u005cn");
+          }
+          else if(tbl.containsKey(token.image))
+          {
+            if(tbl.get(token.image) instanceof ArrayList)
+            {
+              list = (ArrayList<Object>) tbl.get(token.image);
+              for(int i = 0; i < list.size(); i++)
+                erros.append(list.get(i).toString() + " ");
+              erros.append("\u005cn");
+            }
+            else
+                erros.append(tbl.get(token.image).toString() + "\u005cn");
+          }
+
+          else
+                erros.append(token.image + "\u005cn");
   }
 
   final public void calc(RecoverySet f) throws ParseException, Exception {
   double a = 0;
   RecoverySet g = First.calc.union ( f );
     try {
-      if (jj_2_36(2)) {
+      if (jj_2_41(2)) {
         each(g);
         jj_consume_token(END_CMD);
-      } else if (jj_2_37(2)) {
+      } else if (jj_2_42(2)) {
         IfElse(g);
         jj_consume_token(END_CMD);
-      } else if (jj_2_38(2)) {
+      } else if (jj_2_43(2)) {
         vars(null);
+        jj_consume_token(END_CMD);
+      } else if (jj_2_44(2)) {
+        print(null);
         jj_consume_token(END_CMD);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
       }
     } catch (ParseException e) {
-                consumeUntil ( g, e, "calc" );
-                getNextToken();
+        consumeUntil ( g, e, "calc" );
+        getNextToken();
     }
   }
 
@@ -420,11 +470,11 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
                                                   Token var; Object a;
     var = jj_consume_token(VAR);
     jj_consume_token(ATTRIB);
-    if (jj_2_39(2)) {
+    if (jj_2_45(2)) {
       a = list();
-    } else if (jj_2_40(2)) {
+    } else if (jj_2_46(2)) {
       a = jj_consume_token(STRING);
-    } else if (jj_2_41(2)) {
+    } else if (jj_2_47(2)) {
       a = sum(local);
     } else {
       jj_consume_token(-1);
@@ -435,8 +485,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         else
                 local.put(var.image, a);
 
-    System.out.println ( "Vari\u00e1vel ["+var.image+"] criada/modificada!" );
-    System.out.println("Conte\u00fado da vari\u00e1vel: " + a);
+    erros.append( "Vari\u00c3\u00a1vel ["+var.image+"] criada/modificada!" + "\u005cn" );
+    erros.append("Conte\u00c3\u00bado da vari\u00c3\u00a1vel: " + a + "\u005cn");
     {if (true) return var;}
     throw new Error("Missing return statement in function");
   }
@@ -446,14 +496,14 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     a = term(local);
     label_9:
     while (true) {
-      if (jj_2_42(2)) {
+      if (jj_2_48(2)) {
         ;
       } else {
         break label_9;
       }
-      if (jj_2_43(2)) {
+      if (jj_2_49(2)) {
         tk = jj_consume_token(PLUS);
-      } else if (jj_2_44(2)) {
+      } else if (jj_2_50(2)) {
         tk = jj_consume_token(MINUS);
       } else {
         jj_consume_token(-1);
@@ -484,14 +534,14 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     a = unary(local);
     label_10:
     while (true) {
-      if (jj_2_45(2)) {
+      if (jj_2_51(2)) {
         ;
       } else {
         break label_10;
       }
-      if (jj_2_46(2)) {
+      if (jj_2_52(2)) {
         tk = jj_consume_token(MULTIPLY);
-      } else if (jj_2_47(2)) {
+      } else if (jj_2_53(2)) {
         tk = jj_consume_token(DIVIDE);
       } else {
         jj_consume_token(-1);
@@ -519,11 +569,11 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   final public Object unary(Hashtable local) throws ParseException, Exception {
  Object a;
-    if (jj_2_48(2)) {
+    if (jj_2_54(2)) {
       jj_consume_token(MINUS);
       a = element(local);
                                {if (true) return -(Double)a;}
-    } else if (jj_2_49(2)) {
+    } else if (jj_2_55(2)) {
       a = element(local);
                      {if (true) return a;}
     } else {
@@ -535,13 +585,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   final public Object element(Hashtable local) throws ParseException, Exception {
   Token tk; Object a=0;
-    if (jj_2_50(2)) {
+    if (jj_2_56(2)) {
       tk = jj_consume_token(INT_CONSTANT);
                              {if (true) return tk.image ;}
-    } else if (jj_2_51(2)) {
+    } else if (jj_2_57(2)) {
       tk = jj_consume_token(FLOAT);
                        {if (true) return tk.image;}
-    } else if (jj_2_52(2)) {
+    } else if (jj_2_58(2)) {
       tk = jj_consume_token(VAR);
       if(local != null && local.containsKey(tk.image))
         {if (true) return local.get(tk.image);}
@@ -550,9 +600,12 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
         {if (true) return (tbl.get(tk.image));}
 
       {if (true) throw new ParseException (
-        "Vari\u00e1vel ["+ tk.image + "] n\u00e3o localizada!"
+        "Vari\u00c3\u00a1vel ["+ tk.image + "] n\u00c3\u00a3o localizada!"
       + " Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn );}
-    } else if (jj_2_53(2)) {
+
+      erros.append("Vari\u00c3\u00a1vel ["+ tk.image + "] n\u00c3\u00a3o localizada!" + "\u005cn");
+      erros.append(" Linha: " + tk.beginLine + ", Coluna: "+ tk.beginColumn + "\u005cn");
+    } else if (jj_2_59(2)) {
       jj_consume_token(LPAREN);
       a = sum(local);
       jj_consume_token(RPAREN);
@@ -935,20 +988,97 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     finally { jj_save(52, xla); }
   }
 
-  private boolean jj_3R_13() {
-    if (jj_scan_token(VAR)) return true;
-    if (jj_scan_token(ATTRIB)) return true;
+  private boolean jj_2_54(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_54(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(53, xla); }
+  }
+
+  private boolean jj_2_55(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_55(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(54, xla); }
+  }
+
+  private boolean jj_2_56(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_56(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(55, xla); }
+  }
+
+  private boolean jj_2_57(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_57(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(56, xla); }
+  }
+
+  private boolean jj_2_58(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_58(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(57, xla); }
+  }
+
+  private boolean jj_2_59(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_59(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(58, xla); }
+  }
+
+  private boolean jj_3_53() {
+    if (jj_scan_token(DIVIDE)) return true;
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_scan_token(VAR)) return true;
-    if (jj_3R_12()) return true;
+  private boolean jj_3_52() {
+    if (jj_scan_token(MULTIPLY)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    if (jj_scan_token(PRINT)) return true;
+    Token xsp;
+    if (jj_3_40()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_40()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_34() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_51() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_52()) {
+    jj_scanpos = xsp;
+    if (jj_3_53()) return true;
+    }
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3_36() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_34()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
     return false;
   }
 
   private boolean jj_3_33() {
-    if (jj_3R_14()) return true;
+    if (jj_3R_13()) return true;
     return false;
   }
 
@@ -962,66 +1092,28 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_38() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_32() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_34() {
+  private boolean jj_3R_19() {
+    if (jj_3R_20()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_32()) { jj_scanpos = xsp; break; }
+      if (jj_3_51()) { jj_scanpos = xsp; break; }
     }
-    if (jj_scan_token(END_CMD)) return true;
     return false;
   }
 
-  private boolean jj_3_52() {
-    if (jj_scan_token(VAR)) return true;
+  private boolean jj_3_13() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
-  private boolean jj_3_51() {
-    if (jj_scan_token(FLOAT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
+  private boolean jj_3R_14() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_50()) {
+    if (jj_3_12()) {
     jj_scanpos = xsp;
-    if (jj_3_51()) {
-    jj_scanpos = xsp;
-    if (jj_3_52()) {
-    jj_scanpos = xsp;
-    if (jj_3_53()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_50() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) {
-    jj_scanpos = xsp;
-    if (jj_3_38()) return true;
-    }
+    if (jj_3_13()) return true;
     }
     return false;
   }
@@ -1039,7 +1131,10 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     jj_scanpos = xsp;
     if (jj_3_9()) {
     jj_scanpos = xsp;
-    if (jj_3_10()) return true;
+    if (jj_3_10()) {
+    jj_scanpos = xsp;
+    if (jj_3_11()) return true;
+    }
     }
     }
     return false;
@@ -1051,19 +1146,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_11()) {
-    jj_scanpos = xsp;
-    if (jj_3_12()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_scan_token(IF)) return true;
-    if (jj_scan_token(LPAREN)) return true;
+  private boolean jj_3_46() {
+    if (jj_scan_token(STRING)) return true;
     return false;
   }
 
@@ -1072,37 +1156,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_6() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_3()) {
-    jj_scanpos = xsp;
-    if (jj_3_4()) {
-    jj_scanpos = xsp;
-    if (jj_3_5()) return true;
-    }
-    }
+  private boolean jj_3_45() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
-  private boolean jj_3_49() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_48()) {
-    jj_scanpos = xsp;
-    if (jj_3_49()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_48() {
+  private boolean jj_3_50() {
     if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_20()) return true;
     return false;
   }
 
@@ -1111,19 +1171,71 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
+  private boolean jj_3_49() {
+    if (jj_scan_token(PLUS)) return true;
+    return false;
+  }
+
   private boolean jj_3_1() {
     if (jj_3R_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_16() {
+  private boolean jj_3R_17() {
     if (jj_scan_token(LIST)) return true;
     if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
-  private boolean jj_3_29() {
+  private boolean jj_3_48() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_49()) {
+    jj_scanpos = xsp;
+    if (jj_3_50()) return true;
+    }
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_18() {
+    if (jj_3R_19()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_48()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_scan_token(EACH)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_30() {
     if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_32() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_30()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(END_CMD)) return true;
+    return false;
+  }
+
+  private boolean jj_3_39() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_29() {
+    if (jj_3R_13()) return true;
     return false;
   }
 
@@ -1137,65 +1249,45 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_41() {
-    if (jj_3R_17()) return true;
+  private boolean jj_3_59() {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_scan_token(ATTRIB)) return true;
+    return false;
+  }
+
+  private boolean jj_3_26() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
   private boolean jj_3_28() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_30() {
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_28()) { jj_scanpos = xsp; break; }
+      if (jj_3_26()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(END_CMD)) return true;
     return false;
   }
 
-  private boolean jj_3_47() {
-    if (jj_scan_token(DIVIDE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_15() {
-    if (jj_scan_token(EACH)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_46() {
-    if (jj_scan_token(MULTIPLY)) return true;
-    return false;
-  }
-
-  private boolean jj_3_45() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_46()) {
-    jj_scanpos = xsp;
-    if (jj_3_47()) return true;
-    }
-    if (jj_3R_19()) return true;
-    return false;
-  }
-
   private boolean jj_3_25() {
-    if (jj_3R_14()) return true;
+    if (jj_3R_13()) return true;
     return false;
   }
 
-  private boolean jj_3R_18() {
-    if (jj_3R_19()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_45()) { jj_scanpos = xsp; break; }
-    }
+  private boolean jj_3_6() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1209,23 +1301,54 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_24() {
+  private boolean jj_3_42() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_44() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3_58() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_43() {
     if (jj_3R_13()) return true;
     return false;
   }
 
-  private boolean jj_3_26() {
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_24()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(END_CMD)) return true;
+  private boolean jj_3_41() {
+    if (jj_3R_15()) return true;
     return false;
   }
 
-  private boolean jj_3_40() {
-    if (jj_scan_token(STRING)) return true;
+  private boolean jj_3_57() {
+    if (jj_scan_token(FLOAT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_56()) {
+    jj_scanpos = xsp;
+    if (jj_3_57()) {
+    jj_scanpos = xsp;
+    if (jj_3_58()) {
+    jj_scanpos = xsp;
+    if (jj_3_59()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_56() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
     return false;
   }
 
@@ -1234,8 +1357,29 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_39() {
-    if (jj_3R_16()) return true;
+  private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_41()) {
+    jj_scanpos = xsp;
+    if (jj_3_42()) {
+    jj_scanpos = xsp;
+    if (jj_3_43()) {
+    jj_scanpos = xsp;
+    if (jj_3_44()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_38() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    return false;
+  }
+
+  private boolean jj_3_24() {
+    if (jj_scan_token(MAJOR_EQUAL)) return true;
     return false;
   }
 
@@ -1244,77 +1388,55 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_44() {
-    if (jj_scan_token(MINUS)) return true;
-    return false;
-  }
-
-  private boolean jj_3_43() {
-    if (jj_scan_token(PLUS)) return true;
-    return false;
-  }
-
-  private boolean jj_3_42() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_43()) {
-    jj_scanpos = xsp;
-    if (jj_3_44()) return true;
-    }
-    if (jj_3R_18()) return true;
-    return false;
-  }
-
   private boolean jj_3_23() {
-    if (jj_scan_token(MAJOR_EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_22() {
     if (jj_scan_token(MINOR_EQUAL)) return true;
     return false;
   }
 
-  private boolean jj_3_21() {
+  private boolean jj_3_55() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3_22() {
     if (jj_scan_token(EQUALS)) return true;
     return false;
   }
 
-  private boolean jj_3_20() {
-    if (jj_scan_token(MAJOR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
-    if (jj_3R_18()) return true;
+  private boolean jj_3R_20() {
     Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_42()) { jj_scanpos = xsp; break; }
+    xsp = jj_scanpos;
+    if (jj_3_54()) {
+    jj_scanpos = xsp;
+    if (jj_3_55()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_19() {
+  private boolean jj_3_54() {
+    if (jj_scan_token(MINUS)) return true;
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3_21() {
+    if (jj_scan_token(MAJOR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_20() {
     if (jj_scan_token(MINOR)) return true;
     return false;
   }
 
-  private boolean jj_3_18() {
+  private boolean jj_3_19() {
     if (jj_scan_token(OR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(STRING)) return true;
     return false;
   }
 
   private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_17()) {
-    jj_scanpos = xsp;
     if (jj_3_18()) {
     jj_scanpos = xsp;
     if (jj_3_19()) {
@@ -1325,7 +1447,9 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     jj_scanpos = xsp;
     if (jj_3_22()) {
     jj_scanpos = xsp;
-    if (jj_3_23()) return true;
+    if (jj_3_23()) {
+    jj_scanpos = xsp;
+    if (jj_3_24()) return true;
     }
     }
     }
@@ -1335,8 +1459,49 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_17() {
+  private boolean jj_3_18() {
     if (jj_scan_token(AND)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_40() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_37()) {
+    jj_scanpos = xsp;
+    if (jj_3_38()) {
+    jj_scanpos = xsp;
+    if (jj_3_39()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_37() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_17() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_16() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_15() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -1345,37 +1510,14 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_53() {
-    if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  private boolean jj_3_37() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3_16() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
+  private boolean jj_3_14() {
     if (jj_scan_token(VAR)) return true;
     if (jj_3R_12()) return true;
     return false;
   }
 
-  private boolean jj_3_36() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_14() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    if (jj_3R_12()) return true;
+  private boolean jj_3_47() {
+    if (jj_3R_18()) return true;
     return false;
   }
 
@@ -1403,7 +1545,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[53];
+  final private JJCalls[] jj_2_rtns = new JJCalls[59];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1631,7 +1773,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 53; i++) {
+    for (int i = 0; i < 59; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1691,6 +1833,12 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
             case 50: jj_3_51(); break;
             case 51: jj_3_52(); break;
             case 52: jj_3_53(); break;
+            case 53: jj_3_54(); break;
+            case 54: jj_3_55(); break;
+            case 55: jj_3_56(); break;
+            case 56: jj_3_57(); break;
+            case 57: jj_3_58(); break;
+            case 58: jj_3_59(); break;
           }
         }
         p = p.next;
