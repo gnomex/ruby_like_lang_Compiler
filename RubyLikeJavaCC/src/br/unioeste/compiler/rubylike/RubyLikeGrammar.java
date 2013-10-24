@@ -203,7 +203,7 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     if (jj_2_12(2)) {
       jj_consume_token(IF);
       jj_consume_token(LPAREN);
-      expressionLogical(g);
+      cond = expressionLogical(g);
       jj_consume_token(RPAREN);
       jj_consume_token(LBRACE);
       ifBlock(g);
@@ -220,54 +220,128 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
       jj_consume_token(LBRACE);
       ifBlock(g);
       jj_consume_token(RBRACE);
+    System.out.println(cond);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
   }
 
-  final public void expressionLogical(RecoverySet g) throws ParseException, Exception {
+  final public boolean expressionLogical(RecoverySet g) throws ParseException, Exception {
+  Token t1,t2, op;
     if (jj_2_14(2)) {
-      jj_consume_token(VAR);
-      opExpression();
-      jj_consume_token(VAR);
+      t1 = jj_consume_token(VAR);
+      op = opExpression();
+      t2 = jj_consume_token(VAR);
     } else if (jj_2_15(2)) {
-      jj_consume_token(INT_CONSTANT);
-      opExpression();
-      jj_consume_token(INT_CONSTANT);
+      t1 = jj_consume_token(INT_CONSTANT);
+      op = opExpression();
+      t2 = jj_consume_token(INT_CONSTANT);
     } else if (jj_2_16(2)) {
-      jj_consume_token(VAR);
-      opExpression();
-      jj_consume_token(INT_CONSTANT);
+      t1 = jj_consume_token(VAR);
+      op = opExpression();
+      t2 = jj_consume_token(INT_CONSTANT);
     } else if (jj_2_17(2)) {
-      jj_consume_token(INT_CONSTANT);
-      opExpression();
-      jj_consume_token(VAR);
+      t1 = jj_consume_token(INT_CONSTANT);
+      op = opExpression();
+      t2 = jj_consume_token(VAR);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
+          if(tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
+          {
+            /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) && Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("||"))
+	    	return (tbl.get(t1.image) || tbl.get(t2.image));*/
+            if(op.image.equals("<"))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals(">"))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) > Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals("=="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) == Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals("<="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) <= Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals(">="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) >= Integer.parseInt(tbl.get(t2.image).toString()));}
+          }
+          else if(tbl.containsKey(t1.image) && !tbl.containsKey(t2.image))
+          {
+            /*if(op.image.equals("&&"))
+	    	return (tbl.get(t1.image) && Integer.parseInt(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (tbl.get(t1.image) || Integer.parseInt(t2.image));*/
+            if(op.image.equals("<"))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(t2.image));}
+            else if(op.image.equals(">"))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) > Integer.parseInt(t2.image));}
+            else if(op.image.equals("=="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) == Integer.parseInt(t2.image));}
+            else if(op.image.equals("<="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) <= Integer.parseInt(t2.image));}
+            else if(op.image.equals(">="))
+                {if (true) return (Integer.parseInt(tbl.get(t1.image).toString()) >= Integer.parseInt(t2.image));}
+          }
+          else if(!tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
+          {
+            /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(t1.image) && tbl.get(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (Integer.parseInt(t1.image) || tbl.get(t2.image));*/
+            if(op.image.equals("<"))
+                {if (true) return (Integer.parseInt(t1.image) < Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals(">"))
+                {if (true) return (Integer.parseInt(t1.image) > Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals("=="))
+                {if (true) return (Integer.parseInt(t1.image) == Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals("<="))
+                {if (true) return (Integer.parseInt(t1.image) <= Integer.parseInt(tbl.get(t2.image).toString()));}
+            else if(op.image.equals(">="))
+                {if (true) return (Integer.parseInt(t1.image) >= Integer.parseInt(tbl.get(t2.image).toString()));}
+          }
+          else
+          {
+            /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(t1.image) && Integer.parsetInt(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (Integer.parseInt(t1.image) || Integer.parsetInt(t2.image));*/
+            if(op.image.equals("<"))
+                {if (true) return (Integer.parseInt(t1.image) < Integer.parseInt(t2.image));}
+            else if(op.image.equals(">"))
+                {if (true) return (Integer.parseInt(t1.image) > Integer.parseInt(t2.image));}
+            else if(op.image.equals("=="))
+                {if (true) return (Integer.parseInt(t1.image) == Integer.parseInt(t2.image));}
+            else if(op.image.equals("<="))
+                {if (true) return (Integer.parseInt(t1.image) <= Integer.parseInt(t2.image));}
+            else if(op.image.equals(">="))
+                {if (true) return (Integer.parseInt(t1.image) >= Integer.parseInt(t2.image));}
+          }
+    throw new Error("Missing return statement in function");
   }
 
-  final public void opExpression() throws ParseException {
+  final public Token opExpression() throws ParseException {
+  Token token;
     if (jj_2_18(2)) {
-      jj_consume_token(AND);
+      token = jj_consume_token(AND);
     } else if (jj_2_19(2)) {
-      jj_consume_token(OR);
+      token = jj_consume_token(OR);
     } else if (jj_2_20(2)) {
-      jj_consume_token(MINOR);
+      token = jj_consume_token(MINOR);
     } else if (jj_2_21(2)) {
-      jj_consume_token(MAJOR);
+      token = jj_consume_token(MAJOR);
     } else if (jj_2_22(2)) {
-      jj_consume_token(EQUALS);
+      token = jj_consume_token(EQUALS);
     } else if (jj_2_23(2)) {
-      jj_consume_token(MINOR_EQUAL);
+      token = jj_consume_token(MINOR_EQUAL);
     } else if (jj_2_24(2)) {
-      jj_consume_token(MAJOR_EQUAL);
+      token = jj_consume_token(MAJOR_EQUAL);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
+          {if (true) return token;}
+    throw new Error("Missing return statement in function");
   }
 
   final public void ifBlock(RecoverySet g) throws ParseException, Exception {
@@ -1030,8 +1104,110 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     finally { jj_save(58, xla); }
   }
 
+  private boolean jj_3_18() {
+    if (jj_scan_token(AND)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_18()) {
+    jj_scanpos = xsp;
+    if (jj_3_19()) {
+    jj_scanpos = xsp;
+    if (jj_3_20()) {
+    jj_scanpos = xsp;
+    if (jj_3_21()) {
+    jj_scanpos = xsp;
+    if (jj_3_22()) {
+    jj_scanpos = xsp;
+    if (jj_3_23()) {
+    jj_scanpos = xsp;
+    if (jj_3_24()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_40() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_37()) {
+    jj_scanpos = xsp;
+    if (jj_3_38()) {
+    jj_scanpos = xsp;
+    if (jj_3_39()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_37() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_13() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_12()) {
+    jj_scanpos = xsp;
+    if (jj_3_13()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_12() {
+    if (jj_scan_token(IF)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_47() {
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3_9()) {
+    jj_scanpos = xsp;
+    if (jj_3_10()) {
+    jj_scanpos = xsp;
+    if (jj_3_11()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    return false;
+  }
+
   private boolean jj_3_53() {
     if (jj_scan_token(DIVIDE)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
     return false;
   }
 
@@ -1102,57 +1278,24 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_scan_token(IF)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_12()) {
-    jj_scanpos = xsp;
-    if (jj_3_13()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_12() {
-    if (jj_scan_token(IF)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_8()) {
-    jj_scanpos = xsp;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3_10()) {
-    jj_scanpos = xsp;
-    if (jj_3_11()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    return false;
-  }
-
   private boolean jj_3_46() {
     if (jj_scan_token(STRING)) return true;
     return false;
   }
 
-  private boolean jj_3_3() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
+  private boolean jj_3_2() {
+    if (jj_scan_token(0)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    if (jj_scan_token(LIST)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
@@ -1166,24 +1309,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_scan_token(0)) return true;
-    return false;
-  }
-
   private boolean jj_3_49() {
     if (jj_scan_token(PLUS)) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_17() {
-    if (jj_scan_token(LIST)) return true;
-    if (jj_scan_token(LPAREN)) return true;
+  private boolean jj_3_11() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1216,6 +1348,11 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   private boolean jj_3_30() {
     if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
@@ -1255,8 +1392,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_11() {
-    if (jj_scan_token(VAR)) return true;
+  private boolean jj_3_10() {
+    if (jj_scan_token(FLOAT)) return true;
     return false;
   }
 
@@ -1286,8 +1423,8 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_6() {
-    if (jj_scan_token(VAR)) return true;
+  private boolean jj_3_5() {
+    if (jj_scan_token(FLOAT)) return true;
     return false;
   }
 
@@ -1352,8 +1489,20 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_10() {
-    if (jj_scan_token(FLOAT)) return true;
+  private boolean jj_3_9() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_17() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_16() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -1373,23 +1522,20 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
+  private boolean jj_3_15() {
+    if (jj_scan_token(INT_CONSTANT)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
   private boolean jj_3_38() {
     if (jj_scan_token(INT_CONSTANT)) return true;
     return false;
   }
 
-  private boolean jj_3_24() {
-    if (jj_scan_token(MAJOR_EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_5() {
-    if (jj_scan_token(FLOAT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_23() {
-    if (jj_scan_token(MINOR_EQUAL)) return true;
+  private boolean jj_3_14() {
+    if (jj_scan_token(VAR)) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -1398,8 +1544,13 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
-  private boolean jj_3_22() {
-    if (jj_scan_token(EQUALS)) return true;
+  private boolean jj_3_4() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_24() {
+    if (jj_scan_token(MAJOR_EQUAL)) return true;
     return false;
   }
 
@@ -1419,6 +1570,16 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
     return false;
   }
 
+  private boolean jj_3_23() {
+    if (jj_scan_token(MINOR_EQUAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_22() {
+    if (jj_scan_token(EQUALS)) return true;
+    return false;
+  }
+
   private boolean jj_3_21() {
     if (jj_scan_token(MAJOR)) return true;
     return false;
@@ -1431,93 +1592,6 @@ public class RubyLikeGrammar implements RubyLikeGrammarConstants {
 
   private boolean jj_3_19() {
     if (jj_scan_token(OR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_18()) {
-    jj_scanpos = xsp;
-    if (jj_3_19()) {
-    jj_scanpos = xsp;
-    if (jj_3_20()) {
-    jj_scanpos = xsp;
-    if (jj_3_21()) {
-    jj_scanpos = xsp;
-    if (jj_3_22()) {
-    jj_scanpos = xsp;
-    if (jj_3_23()) {
-    jj_scanpos = xsp;
-    if (jj_3_24()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_18() {
-    if (jj_scan_token(AND)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3_40() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_37()) {
-    jj_scanpos = xsp;
-    if (jj_3_38()) {
-    jj_scanpos = xsp;
-    if (jj_3_39()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_37() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_17() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_16() {
-    if (jj_scan_token(VAR)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    if (jj_scan_token(INT_CONSTANT)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3_14() {
-    if (jj_scan_token(VAR)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_47() {
-    if (jj_3R_18()) return true;
     return false;
   }
 

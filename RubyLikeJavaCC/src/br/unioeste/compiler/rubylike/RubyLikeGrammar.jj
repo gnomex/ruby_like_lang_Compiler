@@ -217,24 +217,98 @@ Object list() throws Exception:{
 void IfElse(RecoverySet g) throws Exception:{
  	boolean cond = false;}
 {
-  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE > < ELSE > < LBRACE > elseBlock(g) < RBRACE > |  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE >    }
+  < IF > < LPAREN > cond = expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE > < ELSE > < LBRACE > elseBlock(g) < RBRACE > |  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE >  {
+    System.out.println(cond);  }}
 
-void expressionLogical(RecoverySet g) throws Exception:
-{}
+boolean expressionLogical(RecoverySet g) throws Exception:
 {
-	(< VAR > opExpression() < VAR >) |	(< INT_CONSTANT > opExpression() < INT_CONSTANT >) |
-	(< VAR > opExpression() < INT_CONSTANT >) |	(< INT_CONSTANT > opExpression() < VAR >)
-	}
+  Token t1,t2, op;}
+{
+	(	  (t1 = < VAR > op = opExpression() t2 = < VAR >) |	  (t1 = < INT_CONSTANT > op = opExpression() t2 = < INT_CONSTANT >) |
+	  (t1 = < VAR > op = opExpression() t2 = < INT_CONSTANT >) |	  (t1 = < INT_CONSTANT > op = opExpression() t2 = < VAR >)
+	)	{
+	  if(tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
+	  {
+	    /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) && Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("||"))
+	    	return (tbl.get(t1.image) || tbl.get(t2.image));*/
+	    if(op.image.equals("<"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals(">"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) > Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("=="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) == Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("<="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) <= Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals(">="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) >= Integer.parseInt(tbl.get(t2.image).toString()));
+	  }
+	  else if(tbl.containsKey(t1.image) && !tbl.containsKey(t2.image))
+	  {
+	    /*if(op.image.equals("&&"))
+	    	return (tbl.get(t1.image) && Integer.parseInt(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (tbl.get(t1.image) || Integer.parseInt(t2.image));*/
+	    if(op.image.equals("<"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(t2.image));
+	    else if(op.image.equals(">"))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) > Integer.parseInt(t2.image));
+	    else if(op.image.equals("=="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) == Integer.parseInt(t2.image));
+	    else if(op.image.equals("<="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) <= Integer.parseInt(t2.image));
+	    else if(op.image.equals(">="))
+	    	return (Integer.parseInt(tbl.get(t1.image).toString()) >= Integer.parseInt(t2.image));
+	  }
+	  else if(!tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
+	  {
+	    /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(t1.image) && tbl.get(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (Integer.parseInt(t1.image) || tbl.get(t2.image));*/
+	    if(op.image.equals("<"))
+	    	return (Integer.parseInt(t1.image) < Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals(">"))
+	    	return (Integer.parseInt(t1.image) > Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("=="))
+	    	return (Integer.parseInt(t1.image) == Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals("<="))
+	    	return (Integer.parseInt(t1.image) <= Integer.parseInt(tbl.get(t2.image).toString()));
+	    else if(op.image.equals(">="))
+	    	return (Integer.parseInt(t1.image) >= Integer.parseInt(tbl.get(t2.image).toString()));
+	  }
+	  else
+	  {
+	    /*if(op.image.equals("&&"))
+	    	return (Integer.parseInt(t1.image) && Integer.parsetInt(t2.image));
+	    else if(op.image.equals("||"))
+	    	return (Integer.parseInt(t1.image) || Integer.parsetInt(t2.image));*/
+	    if(op.image.equals("<"))
+	    	return (Integer.parseInt(t1.image) < Integer.parseInt(t2.image));
+	    else if(op.image.equals(">"))
+	    	return (Integer.parseInt(t1.image) > Integer.parseInt(t2.image));
+	    else if(op.image.equals("=="))
+	    	return (Integer.parseInt(t1.image) == Integer.parseInt(t2.image));
+	    else if(op.image.equals("<="))
+	    	return (Integer.parseInt(t1.image) <= Integer.parseInt(t2.image));
+	    else if(op.image.equals(">="))
+	    	return (Integer.parseInt(t1.image) >= Integer.parseInt(t2.image));
+	  }
+	}	}
 
-void opExpression():{}
+Token opExpression():{
+  Token token;}
 {
- 	< AND >
- 	| < OR >
- 	| < MINOR >
- 	| < MAJOR >
- 	| < EQUALS >
- 	| < MINOR_EQUAL >
- 	| < MAJOR_EQUAL >}
+ 	( 	  token = < AND >
+ 	| token = < OR >
+ 	| token = < MINOR >
+ 	| token = < MAJOR >
+ 	| token = < EQUALS >
+ 	| token = < MINOR_EQUAL >
+ 	| token = < MAJOR_EQUAL >
+ 	)
+ 	{ return token;}}
 void ifBlock(RecoverySet g) throws Exception:{}{
 	try	{
 		 (vars(null))* < END_CMD >
