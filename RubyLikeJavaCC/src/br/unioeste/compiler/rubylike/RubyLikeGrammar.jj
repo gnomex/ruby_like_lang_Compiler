@@ -106,8 +106,8 @@ public class RubyLikeGrammar{
      eof=false; // FIXME
      if (debug_recovery) { // Informação sobre a recuperação
        erros.append("");
-       erros.append( "*** " + met + " *** ");
-       erros.append( " Syncronizing Set: "+ g );
+       erros.append( "*** " + met + " *** " + "\n");
+       erros.append( " Syncronizing Set: "+ g + "\n");
      }
      if (g==null) throw e; // se o conjunto de recuperação é null, propaga a exceção
 
@@ -115,11 +115,11 @@ public class RubyLikeGrammar{
      while (!eof) {
        if ( g.contains ( tok.kind ) ) {
          if ( debug_recovery )
-           erros.append( " Found syncronizing token: " + im (tok.kind));
+           erros.append( " Found syncronizing token: " + im (tok.kind) + "\n");
          break;
        }
        if (debug_recovery)
-         erros.append( " Ignorando token "+ im ( tok.kind));
+         erros.append( " Ignorando token "+ im ( tok.kind) + "\n");
        getNextToken();
        tok = getToken(1);
        if (tok.kind==EOF && !g.contains(EOF) )
@@ -181,7 +181,11 @@ TOKEN : /* simbolos especiais */
 | < STRING : "\""(~["\"", "\n", "\r"])* "\"" >| < #DIGIT : [ "0"-"9" ] >
 | < #LETTER : ["A"-"Z"] | ["a"-"z"] >
 | < VAR : < LETTER > ( < DIGIT > | < LETTER > ) * >
-| < FLOAT : < DIGIT >(< DOT >< DIGIT >)* >}
+| < FLOAT : < DIGIT >(< DOT >< DIGIT >)* >}/**
+* da inicio a analise lexica, sintática e semântica do compilador
+* invoca calc()
+* encontrou <EOF > termina a compilação
+*/
 int program() throws Exception:{
   	RecoverySet g = new RecoverySet ( EOF );}
 {
@@ -192,8 +196,13 @@ int program() throws Exception:{
 		consumeUntil ( g, e, "calc" );
 		getNextToken();
   	}}
-
-Object list() throws Exception:{
+/**
+* Cria uma lista no formato ~(1,2,"asksakask")!
+* terminada com ! (< END_CMD >)
+* o problema é que só esta pegando o primeiro e o ultimo valor ...
+* retorna uma lista
+*/
+/*Object list() throws Exception:{
   	Token t; List<Object> lista = new ArrayList<Object>();}
 {
   < LIST >
@@ -212,14 +221,44 @@ Object list() throws Exception:{
   	< RPAREN >
   	
   	
-  {return lista;}}
+  {return lista;}} */
 
-void IfElse(RecoverySet g) throws Exception:{
- 	boolean cond = false;}
+Object list() throws Exception:
 {
-  < IF > < LPAREN > cond = expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE > < ELSE > < LBRACE > elseBlock(g) < RBRACE > |  < IF > < LPAREN > expressionLogical(g) < RPAREN > < LBRACE > ifBlock(g) < RBRACE >  {
-    System.out.println(cond);  }}
+  	Token t; List<Object> lista = new ArrayList<Object>();
+}
+{
+  < LIST >
+  	< LPAREN >
+  		list_vars (lista)  ( "," list_vars(lista) )*  		    		
+  	< RPAREN >  	
+  	
+  {return lista;}
+}
 
+void list_vars (List<Object> lista) throws Exception: { Token t; }  
+{
+  		( t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)
+  		{
+  	  		System.out.println(t.image);
+   			lista.add(t.image);
+  		}
+}
+
+/**
+* Analisa o if e o else
+* verifica a condição logica (ainda não decide o que fazer)
+* e entra no bloco do if, e no bloco do else
+*/
+void IfElse(RecoverySet g) throws Exception:{
+ 	boolean cond = false; Token token;}
+{
+  < IF > < LPAREN > cond = expressionLogical(g) < RPAREN >(< LBRACE > ifBlock(g,cond) < RBRACE >)*
+  [LOOKAHEAD(2) < ELSE > < LBRACE > elseBlock(g,cond) < RBRACE >]   }
+/**
+* Analisa a expressão lógica do if
+* lê apenas variavel e inteiro
+*/
 boolean expressionLogical(RecoverySet g) throws Exception:
 {
   Token t1,t2, op;}
@@ -296,7 +335,9 @@ boolean expressionLogical(RecoverySet g) throws Exception:
 	    	return (Integer.parseInt(t1.image) >= Integer.parseInt(t2.image));
 	  }
 	}	}
-
+/**
+* Pega o operador lógico e retorna o token
+*/
 Token opExpression():{
   Token token;}
 {
@@ -309,43 +350,90 @@ Token opExpression():{
  	| token = < MAJOR_EQUAL >
  	)
  	{ return token;}}
-void ifBlock(RecoverySet g) throws Exception:{}{
-	try	{
-		 (vars(null))* < END_CMD >
-		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
-		consumeUntil(g, e, "ifBlock");	}}
-
-void elseBlock(RecoverySet g) throws Exception:
-{}
+/**
+* Bloco do IF
+* aceita variaveis locais e globais, outro if e else e o comando print seguidos do !
+*/
+void ifBlock(RecoverySet g,boolean cond) throws Exception:
 {
-	try	{
-		(vars(null))* < END_CMD >
-		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
-		consumeUntil(g, e, "elseBlock");	}}
+  Hashtable local = new Hashtable(); Token token = null;
+}
+{
+  {
+    if(cond == false)    {
+      token = getNextToken();
+      while(!token.image.equals("}")) token = getNextToken();      return;    }  }
+	try
+	{
+		 ((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*
+	//|  < END_CMD > 
+	}catch(ParseException e)
+	{
+		consumeUntil(g, e, "ifBlock");
+	}
+}
 
+/**
+* Bloco do ELSE
+* aceita variaveis locais e globais, if e else, e o comando print seguido de !
+*/
+void elseBlock(RecoverySet g,boolean cond) throws Exception:
+{
+  Hashtable local = new Hashtable(); Token token = null;}
+{
+  {
+    if(cond == true)    {
+      token = getNextToken();
+      while(!token.image.equals("}")) token = getNextToken();
+      return;    }  }
+	try	{
+		((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*	}catch(ParseException e)	{
+		consumeUntil(g, e, "elseBlock");	}
+	{return;}}
+/**
+* Loop
+* formato:
+* each(a -> lista)* {
+*   < BLOCO >* }
+*/
 void each(RecoverySet g) throws Exception:{}
 {
 	< EACH > < LPAREN > eachExp(g) < RPAREN > < LBRACE > eachBlock(g) < RBRACE >}
-
+/**
+* Analisa a expressão do each
+* a -> list
+*/
 void eachExp(RecoverySet g) throws Exception:
-{}
+{
+  Token var = null, list = null;}
 {
   try  {
-	< VAR > < SETA > < VAR >
+	var = < VAR > < SETA > list = < VAR >
   }catch(ParseException e)  {
-    consumeUntil(g, e, "eachExp");  }}
+    consumeUntil(g, e, "eachExp");  }
 
-void eachBlock(RecoverySet g) throws Exception:{}
+  {
+    if(tbl.containsKey(list.image))
+    {
+      tbl.put(var.image, tbl.get(list.image)); //faz uma copia da lista com o novo símbolo chave    }  }}
+/**
+* Bloco do each
+* aceita variaveis, if else seguido de !
+*/
+void eachBlock(RecoverySet g) throws Exception:{
+  Hashtable local = new Hashtable();}
 {
 	try	{
-		(vars(null))* < END_CMD >
-		| (IfElse(g))* < END_CMD >	}catch(ParseException e)	{
+		((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*	}catch(ParseException e)	{
 		consumeUntil(g, e, "eachBlock");	}}
-
+/**
+* Comando print para visualizar o conteudo das variaveis
+* aceita variavel local e global e lista
+*/
 void print(Hashtable local):{
   Token token; List<Object> list;}
 {
-	< PRINT > ( token = < VAR > | token = < INT_CONSTANT > | token = < STRING >)+
+	< PRINT > ( token = < VAR > | token = < INT_CONSTANT > | token = < STRING >)
 	{
 	  if(local != null && local.containsKey(token.image))	  {
 	    if(local.get(token.image) instanceof ArrayList)	    {
@@ -355,7 +443,8 @@ void print(Hashtable local):{
 	      erros.append("\n");	    }
 	    else
 	    	erros.append(local.get(token.image).toString() + "\n");	  }
-	  else if(tbl.containsKey(token.image))
+	else
+	  if(tbl.containsKey(token.image))
 	  {
 	    if(tbl.get(token.image) instanceof ArrayList)	    {
 	      list = (ArrayList<Object>) tbl.get(token.image);
@@ -364,10 +453,15 @@ void print(Hashtable local):{
 	      erros.append("\n");	    }
 	    else
 	    	erros.append(tbl.get(token.image).toString() + "\n");	  }
-	  	
 	  else
-	  	erros.append(token.image + "\n");	} }
+	  	erros.append(token.image + "\n");
 
+	  return;	}
+	}
+/**
+* Faz o calculo de expressões matemáticas com uma variavel a esquerda
+* ou loop each ou if else ou print
+*/
 void calc (RecoverySet f) throws Exception :
 { double a = 0;
   RecoverySet g = First.calc.union ( f );
@@ -384,7 +478,11 @@ void calc (RecoverySet f) throws Exception :
   }  
 }
 
-// Declarar ou alterar o valor de variáveis
+/**
+* Declarar ou alterar o valor de variáveis
+* aceita inteiro, string, lista ou expressão do lado direito do =
+* retorna um objeto
+*/
 Object vars(Hashtable local) throws Exception : { Token var; Object a; }
 {
   var = < VAR > < ATTRIB > (a = list() |  a = < STRING > | a = sum(local))
@@ -399,7 +497,9 @@ Object vars(Hashtable local) throws Exception : { Token var; Object a; }
     return var;
   }
 }
-
+/**
+* Faz soma e subtração
+*/
 Object sum(Hashtable local)  throws Exception : { Object a, b; Token tk; Double a1, b1; }
 {
   a = term(local)
@@ -424,7 +524,9 @@ Object sum(Hashtable local)  throws Exception : { Object a, b; Token tk; Double 
   )*
   { return a; }
 }
-
+/**
+* Faz multiplicação e divisão
+*/
 Object term(Hashtable local)  throws Exception : { Object a, b; Token tk; Double a1, b1;}
 {
   a = unary(local)
