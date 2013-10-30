@@ -202,26 +202,6 @@ int program() throws Exception:{
 * o problema é que só esta pegando o primeiro e o ultimo valor ...
 * retorna uma lista
 */
-/*Object list() throws Exception:{
-  	Token t; List<Object> lista = new ArrayList<Object>();}
-{
-  < LIST >
-  	< LPAREN >
-  		(t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)
-  		{
-  	  		System.out.println(t.image);
-   			lista.add(t.image);
-  		}
-  		("," t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)*
-  		{
-  	  		System.out.println(t.image);
-   			lista.add(t.image);
-  		}
-  		
-  	< RPAREN >
-  	
-  	
-  {return lista;}} */
 
 Object list() throws Exception:
 {
@@ -240,7 +220,6 @@ void list_vars (List<Object> lista) throws Exception: { Token t; }
 {
   		( t = < INT_CONSTANT > | t = < STRING > | t = < FLOAT > | t = < VAR >)
   		{
-  	  		System.out.println(t.image);
    			lista.add(t.image);
   		}
 }
@@ -250,11 +229,20 @@ void list_vars (List<Object> lista) throws Exception: { Token t; }
 * verifica a condição logica (ainda não decide o que fazer)
 * e entra no bloco do if, e no bloco do else
 */
-void IfElse(RecoverySet g) throws Exception:{
+void IfElse(RecoverySet g,boolean c) throws Exception:{
  	boolean cond = false; Token token;}
-{
-  < IF > < LPAREN > cond = expressionLogical(g) < RPAREN >(< LBRACE > ifBlock(g,cond) < RBRACE >)*
-  [LOOKAHEAD(2) < ELSE > < LBRACE > elseBlock(g,cond) < RBRACE >]   }
+{ 
+  try  {
+    < IF > < LPAREN > cond = expressionLogical(g) < RPAREN >
+    < LBRACE >
+      block(g, ((c == false) ? c : cond))
+    < RBRACE >
+    [ < ELSE >
+      < LBRACE >
+       block(g,!cond) 
+      < RBRACE >]  }catch(ParseException e){
+		consumeUntil(g, e, "ifElse");
+  }   }
 /**
 * Analisa a expressão lógica do if
 * lê apenas variavel e inteiro
@@ -268,10 +256,13 @@ boolean expressionLogical(RecoverySet g) throws Exception:
 	)	{
 	  if(tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
 	  {
-	    /*if(op.image.equals("&&"))
-	    	return (Integer.parseInt(tbl.get(t1.image).toString()) && Integer.parseInt(tbl.get(t2.image).toString()));
-	    else if(op.image.equals("||"))
-	    	return (tbl.get(t1.image) || tbl.get(t2.image));*/
+	    
+		if(!(tbl.get(t1.image) instanceof Integer))		{		  erros.append("tipo incompativo na expressão! só aceita inteiro");
+		  return false;		}		
+		if(!(tbl.get(t2.image) instanceof Integer))		{
+		  erros.append("tipo incompativo na expressão! só aceita inteiro");		  return false;
+		}
+		
 	    if(op.image.equals("<"))
 	    	return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(tbl.get(t2.image).toString()));
 	    else if(op.image.equals(">"))
@@ -285,10 +276,12 @@ boolean expressionLogical(RecoverySet g) throws Exception:
 	  }
 	  else if(tbl.containsKey(t1.image) && !tbl.containsKey(t2.image))
 	  {
-	    /*if(op.image.equals("&&"))
-	    	return (tbl.get(t1.image) && Integer.parseInt(t2.image));
-	    else if(op.image.equals("||"))
-	    	return (tbl.get(t1.image) || Integer.parseInt(t2.image));*/
+	    if(!(tbl.get(t1.image) instanceof Integer))
+		{
+		  erros.append("tipo incompativo na expressão! só aceita inteiro");
+		  return false;
+		}
+		
 	    if(op.image.equals("<"))
 	    	return (Integer.parseInt(tbl.get(t1.image).toString()) < Integer.parseInt(t2.image));
 	    else if(op.image.equals(">"))
@@ -302,10 +295,13 @@ boolean expressionLogical(RecoverySet g) throws Exception:
 	  }
 	  else if(!tbl.containsKey(t1.image) && tbl.containsKey(t2.image))
 	  {
-	    /*if(op.image.equals("&&"))
-	    	return (Integer.parseInt(t1.image) && tbl.get(t2.image));
-	    else if(op.image.equals("||"))
-	    	return (Integer.parseInt(t1.image) || tbl.get(t2.image));*/
+		
+		if(!(tbl.get(t2.image) instanceof Integer))
+		{
+		  erros.append("tipo incompativo na expressão! só aceita inteiro");
+		  return false;
+		}
+		
 	    if(op.image.equals("<"))
 	    	return (Integer.parseInt(t1.image) < Integer.parseInt(tbl.get(t2.image).toString()));
 	    else if(op.image.equals(">"))
@@ -319,10 +315,7 @@ boolean expressionLogical(RecoverySet g) throws Exception:
 	  }
 	  else
 	  {
-	    /*if(op.image.equals("&&"))
-	    	return (Integer.parseInt(t1.image) && Integer.parsetInt(t2.image));
-	    else if(op.image.equals("||"))
-	    	return (Integer.parseInt(t1.image) || Integer.parsetInt(t2.image));*/
+	    
 	    if(op.image.equals("<"))
 	    	return (Integer.parseInt(t1.image) < Integer.parseInt(t2.image));
 	    else if(op.image.equals(">"))
@@ -351,21 +344,18 @@ Token opExpression():{
  	)
  	{ return token;}}
 /**
-* Bloco do IF
+* Bloco do IF e ELSE
 * aceita variaveis locais e globais, outro if e else e o comando print seguidos do !
 */
-void ifBlock(RecoverySet g,boolean cond) throws Exception:
+void block(RecoverySet f,boolean cond) throws Exception:
 {
   Hashtable local = new Hashtable(); Token token = null;
+  RecoverySet g = First.ifStmt.union(f);
 }
 {
-  {
-    if(cond == false)    {
-      token = getNextToken();
-      while(!token.image.equals("}")) token = getNextToken();      return;    }  }
-	try
+ 	try
 	{
-		 ((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*
+		 ((vars(local, cond) | IfElse(g,cond) | print(local, cond) ) < END_CMD > )*
 	//|  < END_CMD > 
 	}catch(ParseException e)
 	{
@@ -377,9 +367,10 @@ void ifBlock(RecoverySet g,boolean cond) throws Exception:
 * Bloco do ELSE
 * aceita variaveis locais e globais, if e else, e o comando print seguido de !
 */
-void elseBlock(RecoverySet g,boolean cond) throws Exception:
+/*void elseBlock(RecoverySet f,boolean cond) throws Exception:
 {
-  Hashtable local = new Hashtable(); Token token = null;}
+  Hashtable local = new Hashtable(); Token token = null;
+  RecoverySet g = First.elseStmt.union(f);}
 {
   {
     if(cond == true)    {
@@ -389,7 +380,7 @@ void elseBlock(RecoverySet g,boolean cond) throws Exception:
 	try	{
 		((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*	}catch(ParseException e)	{
 		consumeUntil(g, e, "elseBlock");	}
-	{return;}}
+	{return;}}*/
 /**
 * Loop
 * formato:
@@ -420,43 +411,52 @@ void eachExp(RecoverySet g) throws Exception:
 * Bloco do each
 * aceita variaveis, if else seguido de !
 */
-void eachBlock(RecoverySet g) throws Exception:{
-  Hashtable local = new Hashtable();}
+void eachBlock(RecoverySet f) throws Exception:{
+  Hashtable local = new Hashtable();
+  RecoverySet g = First.eachStmt.union(f);}
 {
 	try	{
-		((vars(local) | IfElse(g) | print(local) ) < END_CMD > )*	}catch(ParseException e)	{
+		((vars(local, true) | IfElse(g, false) | print(local, true) ) < END_CMD > )*	}catch(ParseException e)	{
 		consumeUntil(g, e, "eachBlock");	}}
 /**
 * Comando print para visualizar o conteudo das variaveis
 * aceita variavel local e global e lista
 */
-void print(Hashtable local):{
+void print(Hashtable local, boolean cond):{
   Token token; List<Object> list;}
 {
 	< PRINT > ( token = < VAR > | token = < INT_CONSTANT > | token = < STRING >)
 	{
-	  if(local != null && local.containsKey(token.image))	  {
-	    if(local.get(token.image) instanceof ArrayList)	    {
-	      list = (ArrayList<Object>) local.get(token.image);
-	      for(int i = 0; i < list.size(); i++)
-	        erros.append(list.get(i).toString() + " ");
-	      erros.append("\n");	    }
-	    else
-	    	erros.append(local.get(token.image).toString() + "\n");	  }
-	else
-	  if(tbl.containsKey(token.image))
-	  {
-	    if(tbl.get(token.image) instanceof ArrayList)	    {
-	      list = (ArrayList<Object>) tbl.get(token.image);
-	      for(int i = 0; i < list.size(); i++)
-	        erros.append(list.get(i).toString() + " ");
-	      erros.append("\n");	    }
-	    else
-	    	erros.append(tbl.get(token.image).toString() + "\n");	  }
-	  else
-	  	erros.append(token.image + "\n");
+	  if (cond)	  {
+	    if(local != null && local.containsKey(token.image))
+	  	{
+	    	if(local.get(token.image) instanceof ArrayList)
+	    	{
+	      		list = (ArrayList<Object>) local.get(token.image);
+	      		for(int i = 0; i < list.size(); i++)
+	        		erros.append(list.get(i).toString() + " ");
+	      		erros.append("\n");
+	    	}
+	    	else
+	    		erros.append(local.get(token.image).toString() + "\n");
+	  	}
+		else if(tbl.containsKey(token.image))
+	  	{
+	    	if(tbl.get(token.image) instanceof ArrayList)
+	    	{
+	      		list = (ArrayList<Object>) tbl.get(token.image);
+	      		for(int i = 0; i < list.size(); i++)
+	        		erros.append(list.get(i).toString() + " ");
+	      		erros.append("\n");
+	    	}
+	    	else
+	    		erros.append(tbl.get(token.image).toString() + "\n");
+	  	}
+	  	else
+	  		erros.append(token.image + "\n");
 
-	  return;	}
+	  	return;
+	  }	}
 	}
 /**
 * Faz o calculo de expressões matemáticas com uma variavel a esquerda
@@ -469,9 +469,9 @@ void calc (RecoverySet f) throws Exception :
 {
   try  {
 	each(g) 		< END_CMD >
-	| IfElse(g)		< END_CMD >
-    | vars(null)    < END_CMD >
-    | print(null)	< END_CMD >	
+	| IfElse(g,true)		< END_CMD >
+    | vars(null, true)    < END_CMD >
+    | print(null, true)	< END_CMD >	
   } catch ( ParseException e ) {
 	consumeUntil ( g, e, "calc" );
 	getNextToken();
@@ -483,18 +483,19 @@ void calc (RecoverySet f) throws Exception :
 * aceita inteiro, string, lista ou expressão do lado direito do =
 * retorna um objeto
 */
-Object vars(Hashtable local) throws Exception : { Token var; Object a; }
+void vars(Hashtable local, boolean cond) throws Exception : { Token var; Object a; }
 {
   var = < VAR > < ATTRIB > (a = list() |  a = < STRING > | a = sum(local))
   {
-    if(local == null)
-    	tbl.put ( var.image, a );
-   	else
-   		local.put(var.image, a);
+    if(cond)    {
+    	if(local == null)
+    		tbl.put ( var.image, a );
+   		else
+   			local.put(var.image, a);
    		
-    erros.append( "Variável ["+var.image+"] criada/modificada!" + "\n" );
-    erros.append("Conteúdo da variável: " + a + "\n");
-    return var;
+    	erros.append( "Variável ["+var.image+"] criada/modificada!" + "\n" );
+    	erros.append("Conteúdo da variável: " + a + "\n");
+   }
   }
 }
 /**
